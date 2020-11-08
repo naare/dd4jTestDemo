@@ -1,0 +1,5 @@
+.idea/*
+target/*
+src/test/resources/containers/new/*
+*.iml
+**/.DS_Store
