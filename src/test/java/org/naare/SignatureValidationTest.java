@@ -1,12 +1,11 @@
 package org.naare;
 
 import org.digidoc4j.*;
-import org.digidoc4j.signers.PKCS12SignatureToken;
-import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SignatureValidation {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class SignatureValidationTest {
 
     @Test
     public void validateSignature() {
@@ -22,6 +21,6 @@ public class SignatureValidation {
 
         boolean isSignatureValid = result.isValid();
 
-        Assert.assertTrue(isSignatureValid);
+        assertTrue(isSignatureValid);
     }
 }

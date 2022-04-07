@@ -1,13 +1,13 @@
 package org.naare;
 
 import org.digidoc4j.*;
-import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class SignatureCreation {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class SignatureCreationTest {
 
     @Test
     public void signWithDataToSign() {
@@ -35,6 +35,6 @@ public class SignatureCreation {
         DateTime time = new DateTime();
         container.saveAsFile("src\\test\\resources\\containers\\new\\test"+time.getMillis()+".bdoc");
 
-        Assert.assertEquals(container.getSignatures().size(),1);
+        assertEquals(container.getSignatures().size(),1);
     }
 }
