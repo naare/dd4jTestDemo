@@ -11,34 +11,57 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.naare.signing.Helpers.buildContainer;
 import static org.naare.signing.Helpers.getDataToSign;
+import static org.naare.signing.Helpers.getDateTime;
 
 
 public class SignatureCreationTest {
 
-    String outputFolder = "src\\test\\resources\\output\\signatureCreation\\";
+    String outputFolderCreating = "src\\test\\resources\\output\\signatureCreation\\";
+    String outputFolderExisting = "src\\test\\resources\\output\\\\ExistingContainers\\";
 
     @Test
-    public void signWithDataToSign() throws IOException {
+    public void signPkcs11WithDataToSign() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        /* Set AIA source as a default for OCSP */
-        //configuration.setPreferAiaOcsp(true);
+        /* Set dummy TSL refresh callback */
+//        configuration.setTslRefreshCallback(summary -> true);
+
+        /* Use AIA OCSP source (default true) */
+//        configuration.setPreferAiaOcsp(false);
 
         /* Reading a file to a stream */
-        //InputStream inputStream = FileUtils.openInputStream(new File("C:\\Users\\heiti\\REPO\\big_big_dummy.txt"));
+//        InputStream inputStream = FileUtils.openInputStream(new File("C:\\Users\\heiti\\REPO\\big_big_dummy.txt"));
 
         Container container = ContainerBuilder
                 .aContainer(Container.DocumentType.ASICE)
+//                .aContainer(Container.DocumentType.BDOC)
+//                .aContainer(Container.DocumentType.ASICS)
+//                .aContainer(Container.DocumentType.DDOC)
+//                .aContainer(Container.DocumentType.PADES)
                 .withConfiguration(configuration)
-                //.withDataFile(inputStream,"big_big_dummy.txt", "application/octet-stream")
+                /* Reading a file to a stream */
+//                .withDataFile(inputStream,"big_big_dummy.txt", "application/octet-stream")
+                /* Use datafile */
                 .withDataFile("src/test/resources/files/test.txt", "application/octet-stream")
                 .build();
 
         /* Sign with ID card using IDEMIA driver */
         PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", "12345".toCharArray(), 1);
 
-        DataToSign dataToSign = SignatureBuilder.aSignature(container).
-                withSigningCertificate(signatureToken.getCertificate()).withSignatureProfile(SignatureProfile.LT).buildDataToSign();
+        DataToSign dataToSign = SignatureBuilder
+                .aSignature(container)
+                .withCity("San Pedro")
+                .withStateOrProvince("Puerto Vallarta")
+                .withPostalCode("13456")
+                .withCountry("Val Verde")
+                .withRoles("Manager", "Suspicious Fisherman")
+                .withSigningCertificate(signatureToken.getCertificate())
+//                .withSignatureProfile(SignatureProfile.B_EPES)
+//                .withSignatureProfile(SignatureProfile.B_BES)
+                .withSignatureProfile(SignatureProfile.LT)
+//                .withSignatureProfile(SignatureProfile.LTA)
+//                .withSignatureProfile(SignatureProfile.LT_TM)
+                .buildDataToSign();
 
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
 
@@ -46,10 +69,37 @@ public class SignatureCreationTest {
 
         container.addSignature(signature);
 
-        DateTime time = new DateTime();
-        container.saveAsFile(outputFolder + "TEST" + "_SignedWithData_" + time.getMillis() + ".asice");
+        container.saveAsFile(outputFolderCreating + "TEST_Plus" + "_SignedWithData_" + getDateTime() + ".asice");
 
         assertEquals(container.getSignatures().size(), 1);
+    }
+
+    @Test
+    public void signPkcs11WithDataToSignExistingContainer() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        /* Use AIA OCSP source (default true) */
+//        configuration.setPreferAiaOcsp(true);
+
+        Container container = ContainerOpener
+                .open(outputFolderExisting + "\\1_ASICE_TEST.asice", configuration);
+
+        /* Sign container n times */
+        for (int i = 0; i < 10; i++) {
+            PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", "12345".toCharArray(), 1);
+
+            DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
+
+            byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+
+            org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+
+            container.addSignature(signature);
+        }
+
+        container.saveAsFile(outputFolderExisting + "TEST_Multiple_Signatures_" + "LT" + "_" + getDateTime() + ".asice");
+
+        assertEquals(11, container.getSignatures().size());
     }
 
     @Test
