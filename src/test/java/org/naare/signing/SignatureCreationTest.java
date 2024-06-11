@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.naare.signing.Helpers.buildContainer;
 import static org.naare.signing.Helpers.getDataToSign;
 import static org.naare.signing.Helpers.getDateTime;
+import static org.naare.signing.Helpers.getDefaultPkcs11SignatureToken;
+import static org.naare.signing.Helpers.getDefaultPkcs12SignatureToken;
 
 
 public class SignatureCreationTest {
@@ -46,7 +48,7 @@ public class SignatureCreationTest {
                 .build();
 
         /* Sign with ID card using IDEMIA driver */
-        PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", "12345".toCharArray(), 1);
+        PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("12345");
 
         DataToSign dataToSign = SignatureBuilder
                 .aSignature(container)
@@ -69,7 +71,7 @@ public class SignatureCreationTest {
 
         container.addSignature(signature);
 
-        container.saveAsFile(outputFolderCreating + "TEST_Plus" + "_SignedWithData_" + getDateTime() + ".asice");
+        container.saveAsFile(outputFolderCreating + "TEST_PKCS11_Signature_" + "LT" + "_" + getDateTime() + ".asice");
 
         assertEquals(container.getSignatures().size(), 1);
     }
@@ -85,9 +87,9 @@ public class SignatureCreationTest {
                 .open(outputFolderExisting + "\\1_ASICE_TEST.asice", configuration);
 
         /* Sign container n times */
-        for (int i = 0; i < 10; i++) {
-            PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", "12345".toCharArray(), 1);
+        PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("12345");
 
+        for (int i = 0; i < 10; i++) {
             DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
 
             byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
@@ -97,13 +99,63 @@ public class SignatureCreationTest {
             container.addSignature(signature);
         }
 
-        container.saveAsFile(outputFolderExisting + "TEST_Multiple_Signatures_" + "LT" + "_" + getDateTime() + ".asice");
+        container.saveAsFile(outputFolderExisting + "TEST_PKCS11_Multiple_Signatures_" + "LT" + "_" + getDateTime() + ".asice");
 
         assertEquals(11, container.getSignatures().size());
     }
 
     @Test
-    public void signWithKeystore() throws IOException {
+    public void signPkcs12WithDataToSign() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+
+        /* Sign with keystore */
+        PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
+
+        DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
+
+        byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+
+        org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+
+        container.addSignature(signature);
+
+        container.saveAsFile(outputFolderCreating + "TEST_PKCS12_Signature" + "_LT_" + getDateTime() + ".asice");
+
+        assertEquals(container.getSignatures().size(), 1);
+    }
+
+    @Test
+    public void signPkcs12WithDataToSignExistingContainer() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        /* Use AIA OCSP source (default true) */
+//        configuration.setPreferAiaOcsp(true);
+
+        Container container = ContainerOpener
+                .open(outputFolderExisting + "\\1_ASICE_TEST.asice", configuration);
+
+        /* Sign with keystore */
+        PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
+
+        for (int i = 0; i < 10; i++) {
+            DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
+
+            byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+
+            org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+
+            container.addSignature(signature);
+        }
+
+        container.saveAsFile(outputFolderExisting + "TEST_PKCS12_Multiple_Signatures_" + "LT" + "_" + getDateTime() + ".asice");
+
+        assertEquals(11, container.getSignatures().size());
+    }
+
+    @Test
+    public void signWithKeystore() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
