@@ -4,9 +4,8 @@ import org.digidoc4j.*;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.naare.signing.Helpers.buildContainer;
@@ -154,28 +153,9 @@ public class SignatureCreationTest {
         assertEquals(11, container.getSignatures().size());
     }
 
+    @Disabled("Disabled by default as need Proxy configuration")
     @Test
-    public void signWithKeystore() {
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
-
-        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
-
-        /* Sign with keystore */
-        PKCS12SignatureToken signatureToken = new PKCS12SignatureToken("src\\test\\resources\\keystores\\sign_keystore.p12", "1234".toCharArray());
-
-        DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
-        byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
-        org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
-        container.addSignature(signature);
-
-        DateTime time = new DateTime();
-        container.saveAsFile(outputFolder + "TEST" + "_SignedWithKeystore_" + time.getMillis() + ".asice");
-
-        assertEquals(container.getSignatures().size(), 1);
-    }
-
-    @Test
-    public void signUsingProxy() throws IOException {
+    public void signUsingProxy() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Proxy settings */
@@ -201,30 +181,55 @@ public class SignatureCreationTest {
         container.addSignature(signature);
 
         DateTime time = new DateTime();
-        container.saveAsFile(outputFolder + "TEST" + "_SignedWithProxy_" + time.getMillis() + ".asice");
+        container.saveAsFile(outputFolderCreating + "TEST" + "_SignedWithProxy_" + time.getMillis() + ".asice");
 
         assertEquals(container.getSignatures().size(), 1);
     }
 
+    @Disabled("Disabled by default: needs LIVE ID card, access to TS service (nortal VPN)")
     @Test
-    public void signWithCustomTSL() throws IOException {
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+    public void signWithCustomTSL() {
+        Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom TSL */
-        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "path/to/custom/ssl/truststore.p12");
-        configuration.setSslTruststorePasswordFor(ExternalConnectionType.TSL, "custom-ssl-truststore-password");
-        configuration.setSslTruststoreTypeFor(ExternalConnectionType.TSL,"PKCS12");
+        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "C:\\Users\\heiti\\Development\\DD4J_collection\\dd4jTestDemo\\src\\test\\resources\\conf\\lotl-truststore.p12");
+        configuration.setSslTruststorePasswordFor(ExternalConnectionType.TSL, "digidoc4j-password");
+        configuration.setSslTruststoreTypeFor(ExternalConnectionType.TSL, "PKCS12");
 
         /* Build a container and sign it */
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
-        PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", pin.toCharArray(), 1);
+        PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("<ENTER ID card PIN>");
         DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
         org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
         container.addSignature(signature);
 
         DateTime time = new DateTime();
-        container.saveAsFile(outputFolder + "TEST" + "_SignedWithCustomTSL_" + time.getMillis() + ".asice");
+        container.saveAsFile(outputFolderCreating + "TEST_PKCS11_SignedWithCustomTSL_" + "LT" + "_" + time.getMillis() + ".asice");
+
+        assertEquals(container.getSignatures().size(), 1);
+    }
+
+    @Disabled("Disabled by default as uses PROD mode, can be used with LIVE ID card and it´s PIN code")
+    @Test
+    public void signWithCustomLotlTruststore() {
+        Configuration configuration = Configuration.of(Configuration.Mode.PROD);
+
+        /* Set custom LOTL Truststore*/
+        configuration.setLotlTruststorePath("C:\\Users\\heiti\\Development\\DD4J_collection\\dd4jTestDemo\\src\\test\\resources\\conf\\lotl-truststore.p12");
+        configuration.setLotlTruststorePassword("digidoc4j-password");
+        configuration.setLotlTruststoreType("PKCS12");
+
+        /* Build a container and sign it */
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+        PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("<ENTER ID card PIN>");
+        DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
+        byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+        org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+        container.addSignature(signature);
+
+        DateTime time = new DateTime();
+        container.saveAsFile(outputFolderCreating + "TEST_PKCS11_SignedWithCustomLOTL_" + "LT" + "_" + time.getMillis() + ".asice");
 
         assertEquals(container.getSignatures().size(), 1);
     }
