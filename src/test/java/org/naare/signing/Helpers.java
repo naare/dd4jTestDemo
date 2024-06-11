@@ -32,7 +32,7 @@ public class Helpers {
     }
 
     public static PKCS12SignatureToken getDefaultPkcs12SignatureToken (String PinCode) {
-        return new PKCS12SignatureToken("src\\test\\resources\\keystores\\sign_keystore.p12", PinCode.toCharArray());
+        return new PKCS12SignatureToken("src\\test\\resources\\keystores\\sign_ECC_from_TEST_of_ESTEID2018.p12", PinCode.toCharArray());
     }
 
     public static DataToSign getDataToSign(Container container, PKCS11SignatureToken token, SignatureProfile profile) {
