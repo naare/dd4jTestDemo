@@ -31,7 +31,7 @@ public class SignatureCreationTest {
 //        configuration.setPreferAiaOcsp(false);
 
         /* Reading a file to a stream */
-//        InputStream inputStream = FileUtils.openInputStream(new File("C:\\Users\\heiti\\REPO\\big_big_dummy.txt"));
+//        InputStream inputStream = FileUtils.openInputStream(new File("src/test/resources/files/test.txt"));
 
         Container container = ContainerBuilder
                 .aContainer(Container.DocumentType.ASICE)
@@ -133,7 +133,7 @@ public class SignatureCreationTest {
 //        configuration.setPreferAiaOcsp(true);
 
         Container container = ContainerOpener
-                .open(outputFolderExisting + "\\1_ASICE_TEST.asice", configuration);
+                .open("src\\test\\resources\\containers\\historical\\1_ASICE_TEST.asice", configuration);
 
         /* Sign with keystore */
         PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
@@ -192,7 +192,7 @@ public class SignatureCreationTest {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom TSL */
-        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "C:\\Users\\heiti\\Development\\DD4J_collection\\dd4jTestDemo\\src\\test\\resources\\conf\\lotl-truststore.p12");
+        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "src\\test\\resources\\conf\\PROD-lotl-truststore.p12");
         configuration.setSslTruststorePasswordFor(ExternalConnectionType.TSL, "digidoc4j-password");
         configuration.setSslTruststoreTypeFor(ExternalConnectionType.TSL, "PKCS12");
 
@@ -216,7 +216,7 @@ public class SignatureCreationTest {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom LOTL Truststore*/
-        configuration.setLotlTruststorePath("C:\\Users\\heiti\\Development\\DD4J_collection\\dd4jTestDemo\\src\\test\\resources\\conf\\lotl-truststore.p12");
+        configuration.setLotlTruststorePath("src\\test\\resources\\conf\\PROD-lotl-truststore.p12");
         configuration.setLotlTruststorePassword("digidoc4j-password");
         configuration.setLotlTruststoreType("PKCS12");
 
