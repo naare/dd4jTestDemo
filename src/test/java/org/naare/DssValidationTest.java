@@ -11,13 +11,14 @@ import eu.europa.esig.dss.validation.reports.Reports;
 import org.digidoc4j.Configuration;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class DssValidationTest {
 
     @Test
     public void validateContainerDss() {
         /* Set file to validate */
-        //DSSDocument container = new FileDocument("C:\\Users\\heiti\\Downloads\\IB-7592-CAdES_BASELINE_LTA.asice");
-        DSSDocument container = new FileDocument("C:\\Users\\heiti\\Downloads\\Signature-A-UK_ELD-1.asice");
+        DSSDocument container = new FileDocument("src/test/resources/containers/historical/1_ASICE_TEST.asice");
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Set trusted TSL against what signature is validated */
@@ -32,6 +33,6 @@ public class DssValidationTest {
         SimpleReport simpleReport = reports.getSimpleReport();
         DetailedReport detailedReport = reports.getDetailedReport();
 
-        System.out.println("test");
+        assertTrue(simpleReport.isValid(simpleReport.getFirstSignatureId()));
     }
 }
