@@ -29,7 +29,7 @@ public class SignatureValidationTest {
 //        configuration.getTSL().refresh();
 
         /* Set dummy TSL refresh callback */
-        configuration.setTslRefreshCallback(summary -> true);
+//        configuration.setTslRefreshCallback(summary -> true);
 
         /* Set custom LOTL Truststore*/
 //        configuration.setLotlTruststorePath("src\\test\\resources\\conf\\PROD-lotl-truststore.p12");
