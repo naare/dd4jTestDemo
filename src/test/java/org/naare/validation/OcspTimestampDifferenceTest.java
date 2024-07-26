@@ -13,15 +13,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OcspTimestampWarningsTest {
+public class OcspTimestampDifferenceTest {
 
     Configuration testConfiguration = Configuration.of(Configuration.Mode.TEST);
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "latvian_LT_signature_with_7min_difference_between_TS_and_OCSP",
-            "latvian_LT_signature_with_22h_difference_between_TS_and_OCSP",
-            "latvian_LT_signature_with_44h_difference_between_TS_and_OCSP"})
+            "LV_LT_sig_OCSP_7m_after_TS",
+            "LV_LT_sig_OCSP_22h_after_TS",
+            "LV_LT_sig_OCSP_44h_after_TSP"})
     public void foreignSignatureOcspAfterTsPass(String fileName) {
         testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
 
@@ -50,7 +50,7 @@ public class OcspTimestampWarningsTest {
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
-                fromExistingFile("src/test/resources/files/live/asic/EE_SER-AEX-B-LT-V-20.asice").
+                fromExistingFile("src/test/resources/files/live/asic/EE_LT_sig_OCSP_25h_after_TS.asice").
                 build();
         ContainerValidationResult result = container.validate();
 
@@ -62,18 +62,41 @@ public class OcspTimestampWarningsTest {
         assertEquals(0, result.getContainerWarnings().size());
     }
 
-    @Disabled
-    @Test
-    public void estonianSignatureOcspMoreThen15mAndLessThan24hAfterTsPassWithWarning() {
-    }
-
-    @Test
-    public void estonianSignatureOcspLessThen15mAfterTsPass() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+//            "EE_LT_sig_OCSP_15m6s_after_TS", TODO DD4J-1063 - Tähelepanek 6
+            "EE_LT_sig_OCSP_37m_after_TS"
+    })
+    public void estonianSignatureOcspMoreThen15mAndLessThan24hAfterTsPassWithWarning(String fileName) {
+        String expectedOcspError = "The difference between the OCSP response time and the signature timestamp is in allowable range";
         testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
-                fromExistingFile("src/test/resources/files/test/asic/estonian_LT_signature.asice").
+                fromExistingFile("src/test/resources/files/test/asic/" + fileName + ".asice").
+                build();
+        ContainerValidationResult result = container.validate();
+
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(expectedOcspError, result.getWarnings().get(0).getMessage());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "EE_LT_sig_valid",
+            "EE_LT_sig_OCSP_1m_after_TS",
+            "EE_LT_sig_OCSP_8m_after_TS"
+    })
+    public void estonianSignatureOcspLessThen15mAfterTsPass(String fileName) {
+        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+
+        Container container = ContainerBuilder.
+                aContainer().withConfiguration(testConfiguration).
+                fromExistingFile("src/test/resources/files/test/asic/" + fileName + ".asice").
                 build();
         ContainerValidationResult result = container.validate();
 
