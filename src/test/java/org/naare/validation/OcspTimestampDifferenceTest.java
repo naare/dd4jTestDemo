@@ -4,7 +4,6 @@ import org.digidoc4j.Configuration;
 import org.digidoc4j.Container;
 import org.digidoc4j.ContainerBuilder;
 import org.digidoc4j.ContainerValidationResult;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -38,11 +37,6 @@ public class OcspTimestampDifferenceTest {
         assertEquals(0, result.getContainerWarnings().size());
     }
 
-    @Disabled
-    @Test
-    public void foreignTlevelSignatureGetOcsp24hAfterTsValidationFail() {
-    }
-
     @Test
     public void estonianSignatureOcsp24hAfterTsFail() {
         String expectedOcspError = "The difference between the OCSP response time and the signature timestamp is too large";
@@ -64,7 +58,7 @@ public class OcspTimestampDifferenceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-//            "EE_LT_sig_OCSP_15m6s_after_TS", TODO DD4J-1063 - Tähelepanek 6
+            "EE_LT_sig_OCSP_15m6s_after_TS",
             "EE_LT_sig_OCSP_37m_after_TS"
     })
     public void estonianSignatureOcspMoreThen15mAndLessThan24hAfterTsPassWithWarning(String fileName) {
@@ -105,11 +99,6 @@ public class OcspTimestampDifferenceTest {
         assertEquals(0, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
         assertEquals(0, result.getContainerWarnings().size());
-    }
-
-    @Disabled
-    @Test
-    public void estonianTLevelSignatureGetOcsp24hAfterTsFail() {
     }
 
     @Test
