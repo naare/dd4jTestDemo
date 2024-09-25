@@ -1,14 +1,13 @@
 package org.naare;
 
-import org.digidoc4j.Configuration;
-import org.digidoc4j.Container;
-import org.digidoc4j.DataToSign;
-import org.digidoc4j.SignatureProfile;
+import eu.europa.esig.dss.enumerations.SignatureLevel;
+import org.digidoc4j.*;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.naare.signing.Helpers.*;
 
 class SignatureExtensionTest {
@@ -31,6 +30,15 @@ class SignatureExtensionTest {
         container.extendSignatureProfile(SignatureProfile.LTA);
 
         assertEquals(SignatureProfile.LTA, container.getSignatures().get(0).getProfile());
+
+        ContainerValidationResult result = container.validate();
+
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(0, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+        assertEquals(SignatureLevel.XAdES_BASELINE_LTA, result.getSignatureReports().get(0).getSignatureFormat());
     }
 
     @Disabled("As of now, doesn't seem to be supported")
