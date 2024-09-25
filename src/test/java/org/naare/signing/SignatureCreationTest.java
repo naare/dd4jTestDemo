@@ -83,7 +83,7 @@ public class SignatureCreationTest {
 //        configuration.setPreferAiaOcsp(true);
 
         Container container = ContainerOpener
-                .open(outputFolderExisting + "\\1_ASICE_TEST.asice", configuration);
+                .open("C:\\Users\\heiti\\Development\\DD4J_collection\\dd4jTestDemo\\src\\test\\resources\\containers\\historical\\1_ASICE_TEST.asice", configuration);
 
         /* Sign container n times */
         PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("12345");
