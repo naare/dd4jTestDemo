@@ -56,7 +56,7 @@ class SignatureExtensionTest {
         // Check expected test container was prepared
         assertEquals(SignatureProfile.T, container.getSignatures().get(0).getProfile());
 
-        // Extend signature profile to LTA
+        // Extend signature profile to LT
         container.extendSignatureProfile(SignatureProfile.LT);
 
         assertEquals(SignatureProfile.LT, container.getSignatures().get(0).getProfile());
