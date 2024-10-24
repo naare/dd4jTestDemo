@@ -14,6 +14,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.naare.signing.Helpers.buildCompositeAsicsContainer;
 import static org.naare.signing.Helpers.buildContainer;
 
 class AsicsTimestampTest {
@@ -59,9 +60,8 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Create composite ASiC-S container
-        String filepath = "src\\test\\resources\\files\\Test_ASICS.asics";
-        Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        Container container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
+        Container container = buildCompositeAsicsContainer(
+                "src\\test\\resources\\files\\Test_ASICS.asics", configuration);
 
         // Add timestamp
         container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
