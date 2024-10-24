@@ -1,15 +1,12 @@
 package org.naare.signing;
 
-import org.digidoc4j.Configuration;
-import org.digidoc4j.Container;
-import org.digidoc4j.ContainerBuilder;
-import org.digidoc4j.DataToSign;
-import org.digidoc4j.SignatureBuilder;
-import org.digidoc4j.SignatureProfile;
-import org.digidoc4j.SignatureToken;
+import org.digidoc4j.*;
+import org.digidoc4j.impl.asic.asics.AsicSCompositeContainer;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
+
+import java.nio.file.Paths;
 
 public class Helpers {
 
@@ -27,6 +24,14 @@ public class Helpers {
                 .withConfiguration(config)
                 .withDataFile("src/test/resources/files/test.txt", "application/octet-stream")
                 .build();
+    }
+
+    public static Container buildCompositeAsicsContainer(String nestedContainerPath, Configuration config) {
+        return new AsicSCompositeContainer(
+                ContainerOpener.open(nestedContainerPath, config),
+                Paths.get(nestedContainerPath).getFileName().toString(),
+                config
+        );
     }
 
     public static PKCS11SignatureToken getDefaultPkcs11SignatureToken(String PinCode) {
