@@ -62,6 +62,7 @@ class AsicsTest {
         assertEquals(0, result.getContainerWarnings().size());
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(1, result.getTimestampReports().size());
+        assertEquals(nestedContainer.getTimestamps().get(0).getUniqueId(), result.getTimestampReports().get(0).getUniqueId());
 
         System.out.println(result.getReport());
 

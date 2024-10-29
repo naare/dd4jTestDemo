@@ -147,7 +147,7 @@ class AsicsTimestampTest {
     @Test
     void timestampAsicsWithInvalidTsAndValidate() {
 
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+        Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         // Open ASiC-S container containing DDOC and timestamp which service is withdrawn
         String filepath = "src\\test\\resources\\files\\ValidDDOCinsideAsics.asics";
@@ -156,12 +156,11 @@ class AsicsTimestampTest {
 //         Validate container
         ContainerValidationResult result = container.validate();
         assertTrue(!result.isValid());
-        assertEquals(2, result.getErrors().size());
+        assertEquals(1, result.getErrors().size());
         assertEquals(0, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
         assertEquals(0, result.getContainerWarnings().size());
-        assertTrue(result.getErrors().get(0).getMessage().contains("The certificate chain for time-stamp is not trusted, it does not contain a trust anchor."));
-        assertTrue(result.getErrors().get(1).getMessage().contains("Unable to build a certificate chain up to a trusted list!"));
+        assertTrue(result.getErrors().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
 
         // Add timestamp
         container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
