@@ -240,6 +240,7 @@ class CompositeAsicsTest {
 
     void checkCompositeContainerNesting(CompositeContainer container, Container nestedContainer) {
         assertAll(
+                () -> assertEquals("ASICS", container.getType()),
                 () -> assertEquals(container.getDataFiles().stream().map(DataFile::getId).collect(Collectors.toList()),
                         container.getNestingContainerDataFiles().stream().map(DataFile::getId).collect(Collectors.toList())),
                 () -> assertEquals(container.getSignatures().stream().map(Signature::getId).collect(Collectors.toList()),

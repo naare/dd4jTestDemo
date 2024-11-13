@@ -80,6 +80,14 @@ public class Helpers {
         container.saveAsFile(filePath);
     }
 
+    public static void saveContainer(Container container, String filename) {
+        String filePath = String.format("src\\test\\resources\\output\\%s_%d.%s",
+                filename,
+                new DateTime().getMillis(),
+                container.getType().toLowerCase());
+        container.saveAsFile(filePath);
+    }
+
     public static void validationResultHasNoIssues(ContainerValidationResult result) {
         assertAll(
                 () -> assertTrue(result.isValid()),
