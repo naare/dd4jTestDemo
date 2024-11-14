@@ -4,18 +4,13 @@ import eu.europa.esig.dss.enumerations.SignatureScopeType;
 import eu.europa.esig.dss.enumerations.TimestampQualification;
 import eu.europa.esig.dss.simplereport.jaxb.XmlSignatureScope;
 import org.digidoc4j.*;
-import org.digidoc4j.impl.asic.asics.AsicSCompositeContainer;
 import org.digidoc4j.impl.asic.report.TimestampValidationReport;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.naare.signing.Helpers.buildCompositeAsicsContainer;
-import static org.naare.signing.Helpers.buildContainer;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.naare.signing.Helpers.*;
 
 class AsicsTimestampTest {
 
@@ -38,20 +33,14 @@ class AsicsTimestampTest {
 
         // Validate container
         ContainerValidationResult result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(1, result.getTimestampReports().size());
 
         System.out.println(result.getReport());
 
         // Save container
-//        String outputFolderCreating = "src\\test\\resources\\output\\";
-//        DateTime time = new DateTime();
-//        container.saveAsFile(outputFolderCreating + "TEST" + "_ASICS_" + time.getMillis() + ".asics");
+//        saveContainer(container);
     }
 
     @Test
@@ -60,7 +49,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Create composite ASiC-S container
-        Container container = buildCompositeAsicsContainer(
+        CompositeContainer container = buildCompositeAsicsContainer(
                 "src\\test\\resources\\files\\Test_ASICS.asics", configuration);
 
         // Add timestamp
@@ -68,20 +57,14 @@ class AsicsTimestampTest {
 
         // Validate container
         ContainerValidationResult result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(2, result.getTimestampReports().size());
 
         System.out.println(result.getReport());
 
         // Save container
-//        String outputFolderCreating = "src\\test\\resources\\output\\";
-//        DateTime time = new DateTime();
-//        container.saveAsFile(outputFolderCreating + "TEST" + "_ASICS_" + time.getMillis() + ".asics");
+//        saveContainer(container);
     }
 
     @Test
@@ -98,20 +81,14 @@ class AsicsTimestampTest {
 
         // Validate container
         ContainerValidationResult result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(2, result.getTimestampReports().size());
 
         System.out.println(result.getReport());
 
         // Save container
-//        String outputFolderCreating = "src\\test\\resources\\output\\";
-//        DateTime time = new DateTime();
-//        container.saveAsFile(outputFolderCreating + "TEST" + "_ASICS_" + time.getMillis() + ".asics");
+//        saveContainer(container);
     }
 
     @Test
@@ -128,20 +105,14 @@ class AsicsTimestampTest {
 
         // Validate container
         ContainerValidationResult result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(3, result.getTimestampReports().size());
 
         System.out.println(result.getReport());
 
         // Save container
-//        String outputFolderCreating = "src\\test\\resources\\output\\";
-//        DateTime time = new DateTime();
-//        container.saveAsFile(outputFolderCreating + "TEST" + "_ASICS_" + time.getMillis() + ".asics");
+//        saveContainer(container);
     }
 
     @Test
@@ -155,7 +126,7 @@ class AsicsTimestampTest {
 
 //         Validate container
         ContainerValidationResult result = container.validate();
-        assertTrue(!result.isValid());
+        assertFalse(result.isValid());
         assertEquals(1, result.getErrors().size());
         assertEquals(0, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
@@ -167,9 +138,8 @@ class AsicsTimestampTest {
 
 //         Validate container
         result = container.validate();
-        // TODO: enable after DD4J-1120 is implemented
-//        assertTrue(result.isValid());
-//        assertEquals(0, result.getErrors().size());
+        assertTrue(result.isValid());
+        assertEquals(1, result.getErrors().size());
         assertEquals(0, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
         assertEquals(0, result.getContainerWarnings().size());
@@ -177,9 +147,7 @@ class AsicsTimestampTest {
         System.out.println(result.getReport());
 
         // Save container
-//        String outputFolderCreating = "src\\test\\resources\\output\\";
-//        DateTime time = new DateTime();
-//        container.saveAsFile(outputFolderCreating + "TEST" + "_ASICS_ValidDDOCinsideAsics_" + time.getMillis() + ".asics");
+//        saveContainer(container);
     }
 
     @Test
@@ -201,11 +169,7 @@ class AsicsTimestampTest {
 
         // Check container validity
         result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
         assertEquals(1, result.getTimestampReports().size());
 
@@ -245,11 +209,7 @@ class AsicsTimestampTest {
 
         // Check container validity
         result = container.validate();
-        assertTrue(result.isValid());
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        validationResultHasNoIssues(result);
         assertEquals(2, result.getTimestampReports().size());
 
         // Check first timestamp
