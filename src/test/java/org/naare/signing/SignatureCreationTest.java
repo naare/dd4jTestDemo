@@ -1,6 +1,7 @@
 package org.naare.signing;
 
 import org.digidoc4j.*;
+import org.digidoc4j.exceptions.NotSupportedException;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
@@ -9,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.naare.signing.Helpers.*;
 
 
@@ -235,7 +235,7 @@ public class SignatureCreationTest {
 
     @ParameterizedTest
     @EnumSource(value = SignatureProfile.class, names = {"B_BES", "T", "LT", "LTA"})
-    void signWithProfile(SignatureProfile signatureProfile) {
+    void signWithAllowedProfile(SignatureProfile signatureProfile) {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
@@ -250,5 +250,20 @@ public class SignatureCreationTest {
 
 //        System.out.println(result.getReport());
 //        saveContainer(container);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SignatureProfile.class, names = {"B_EPES", "LT_TM"})
+    void signWithNotAllowedProfile(SignatureProfile signatureProfile) {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+
+        PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
+
+        Exception exception = assertThrows(NotSupportedException.class, () -> {
+            getDataToSign(container, signatureToken, signatureProfile);
+        });
+        assertTrue(exception.getMessage().contains("Not supported: Can't create " + signatureProfile + " signatures"));
     }
 }
