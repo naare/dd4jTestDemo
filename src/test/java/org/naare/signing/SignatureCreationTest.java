@@ -1,18 +1,17 @@
 package org.naare.signing;
 
 import org.digidoc4j.*;
+import org.digidoc4j.exceptions.NotSupportedException;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.naare.signing.Helpers.buildContainer;
-import static org.naare.signing.Helpers.getDataToSign;
-import static org.naare.signing.Helpers.getDateTime;
-import static org.naare.signing.Helpers.getDefaultPkcs11SignatureToken;
-import static org.naare.signing.Helpers.getDefaultPkcs12SignatureToken;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.naare.signing.Helpers.*;
 
 
 public class SignatureCreationTest {
@@ -72,7 +71,7 @@ public class SignatureCreationTest {
 
         container.saveAsFile(outputFolderCreating + "TEST_PKCS11_Signature_" + "LT" + "_" + getDateTime() + ".asice");
 
-        assertEquals(container.getSignatures().size(), 1);
+        assertEquals(1, container.getSignatures().size());
     }
 
     @Test
@@ -122,7 +121,7 @@ public class SignatureCreationTest {
 
         container.saveAsFile(outputFolderCreating + "TEST_PKCS12_Signature" + "_LT_" + getDateTime() + ".asice");
 
-        assertEquals(container.getSignatures().size(), 1);
+        assertEquals(1, container.getSignatures().size());
     }
 
     @Test
@@ -183,7 +182,7 @@ public class SignatureCreationTest {
         DateTime time = new DateTime();
         container.saveAsFile(outputFolderCreating + "TEST" + "_SignedWithProxy_" + time.getMillis() + ".asice");
 
-        assertEquals(container.getSignatures().size(), 1);
+        assertEquals(1, container.getSignatures().size());
     }
 
     @Disabled("Disabled by default: needs LIVE ID card, access to TS service (nortal VPN)")
@@ -207,7 +206,7 @@ public class SignatureCreationTest {
         DateTime time = new DateTime();
         container.saveAsFile(outputFolderCreating + "TEST_PKCS11_SignedWithCustomTSL_" + "LT" + "_" + time.getMillis() + ".asice");
 
-        assertEquals(container.getSignatures().size(), 1);
+        assertEquals(1, container.getSignatures().size());
     }
 
     @Disabled("Disabled by default as uses PROD mode, can be used with LIVE ID card and it´s PIN code")
@@ -231,6 +230,40 @@ public class SignatureCreationTest {
         DateTime time = new DateTime();
         container.saveAsFile(outputFolderCreating + "TEST_PKCS11_SignedWithCustomLOTL_" + "LT" + "_" + time.getMillis() + ".asice");
 
-        assertEquals(container.getSignatures().size(), 1);
+        assertEquals(1, container.getSignatures().size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SignatureProfile.class, names = {"B_BES", "T", "LT", "LTA"})
+    void signWithAllowedProfile(SignatureProfile signatureProfile) {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+
+        SignPkcs12(container, signatureProfile);
+
+        assertEquals(1, container.getSignatures().size());
+        assertEquals(signatureProfile, container.getSignatures().get(0).getProfile());
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.getReport().contains("SignatureFormat=\"XAdES-BASELINE-" +
+                (signatureProfile == SignatureProfile.B_BES ? "B" : signatureProfile) + "\""));
+
+//        System.out.println(result.getReport());
+//        saveContainer(container);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SignatureProfile.class, names = {"B_EPES", "LT_TM"})
+    void signWithNotAllowedProfile(SignatureProfile signatureProfile) {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+
+        PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
+
+        Exception exception = assertThrows(NotSupportedException.class, () -> {
+            getDataToSign(container, signatureToken, signatureProfile);
+        });
+        assertTrue(exception.getMessage().contains("Not supported: Can't create " + signatureProfile + " signatures"));
     }
 }

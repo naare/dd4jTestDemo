@@ -54,6 +54,14 @@ public class Helpers {
                 .buildDataToSign();
     }
 
+    public static void SignPkcs12(Container container, SignatureProfile signatureProfile) {
+        PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
+        DataToSign dataToSign = getDataToSign(container, signatureToken, signatureProfile);
+        byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+        org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+        container.addSignature(signature);
+    }
+
     public static String getDateTime() {
         DateTime time = new DateTime();
         return time.toString("dMMy_") + time.getMillisOfDay();
