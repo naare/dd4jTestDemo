@@ -115,7 +115,7 @@ class AsicsTimestampTest {
     }
 
     @Test
-    void timestampAsicsWithInvalidTsAndValidate() {
+    void timestampAsics_withDdocAndWithdrawnTs_validatesWithWarning() {
 
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
@@ -123,25 +123,28 @@ class AsicsTimestampTest {
         String filepath = "src/test/resources/files/ValidDDOCinsideAsics.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
-//         Validate container
+        // Check container validation returns warning
         ContainerValidationResult result = container.validate();
-        assertFalse(result.isValid());
-        assertEquals(1, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
-        assertTrue(result.getErrors().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
+        assertEquals(1, result.getContainerWarnings().size());
+        assertTrue(result.getWarnings().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
+        assertTrue(result.getContainerWarnings().get(0).getMessage().contains("Found a timestamp token not related to granted status. If not yet covered with a fresh timestamp token, this container might become invalid in the future."));
 
         // Add timestamp
         container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
 
-//         Validate container
+        // Validate container
         result = container.validate();
         assertTrue(result.isValid());
-        assertEquals(1, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
+        assertEquals(1, result.getContainerWarnings().size());
+        assertTrue(result.getWarnings().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
+        assertTrue(result.getContainerWarnings().get(0).getMessage().contains("Found a timestamp token not related to granted status. If not yet covered with a fresh timestamp token, this container might become invalid in the future."));
 
         System.out.println(result.getReport());
 
