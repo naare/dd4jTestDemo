@@ -16,8 +16,8 @@ import static org.naare.signing.Helpers.*;
 
 public class SignatureCreationTest {
 
-    String outputFolderCreating = "src\\test\\resources\\output\\signatureCreation\\";
-    String outputFolderExisting = "src\\test\\resources\\output\\\\ExistingContainers\\";
+    String outputFolderCreating = "src/test/resources/output/signatureCreation/";
+    String outputFolderExisting = "src/test/resources/output/ExistingContainers/";
 
     @Test
     public void signPkcs11WithDataToSign() {
@@ -82,7 +82,7 @@ public class SignatureCreationTest {
 //        configuration.setPreferAiaOcsp(true);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\containers\\historical\\1_ASICE_TEST.asice", configuration);
+                .open("src/test/resources/containers/historical/1_ASICE_TEST.asice", configuration);
 
         /* Sign container n times */
         PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("12345");
@@ -132,7 +132,7 @@ public class SignatureCreationTest {
 //        configuration.setPreferAiaOcsp(true);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\containers\\historical\\1_ASICE_TEST.asice", configuration);
+                .open("src/test/resources/containers/historical/1_ASICE_TEST.asice", configuration);
 
         /* Sign with keystore */
         PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
@@ -173,7 +173,7 @@ public class SignatureCreationTest {
 
         /* Build a container and sign it */
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
-        PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", "12345".toCharArray(), 1);
+        PKCS11SignatureToken signatureToken = new PKCS11SignatureToken("C:/Program Files/IDEMIA/AWP/DLLs/OcsCryptoki.dll", "12345".toCharArray(), 1);
         DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
         org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
@@ -191,7 +191,7 @@ public class SignatureCreationTest {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom TSL */
-        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "src\\test\\resources\\conf\\PROD-lotl-truststore.p12");
+        configuration.setSslTruststorePathFor(ExternalConnectionType.TSL, "src/test/resources/conf/PROD-lotl-truststore.p12");
         configuration.setSslTruststorePasswordFor(ExternalConnectionType.TSL, "digidoc4j-password");
         configuration.setSslTruststoreTypeFor(ExternalConnectionType.TSL, "PKCS12");
 
@@ -215,7 +215,7 @@ public class SignatureCreationTest {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom LOTL Truststore*/
-        configuration.setLotlTruststorePath("src\\test\\resources\\conf\\PROD-lotl-truststore.p12");
+        configuration.setLotlTruststorePath("src/test/resources/conf/PROD-lotl-truststore.p12");
         configuration.setLotlTruststorePassword("digidoc4j-password");
         configuration.setLotlTruststoreType("PKCS12");
 

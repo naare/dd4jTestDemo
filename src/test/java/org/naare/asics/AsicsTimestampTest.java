@@ -50,7 +50,7 @@ class AsicsTimestampTest {
 
         // Create composite ASiC-S container
         CompositeContainer container = buildCompositeAsicsContainer(
-                "src\\test\\resources\\files\\Test_ASICS.asics", configuration);
+                "src/test/resources/files/Test_ASICS.asics", configuration);
 
         // Add timestamp
         container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
@@ -73,7 +73,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing datafile ASiC-S container
-        String filepath = "src\\test\\resources\\files\\Test_ASICS.asics";
+        String filepath = "src/test/resources/files/Test_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -97,7 +97,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing composite ASiC-S container
-        String filepath = "src\\test\\resources\\files\\TEST_composite_ASICS.asics";
+        String filepath = "src/test/resources/files/TEST_composite_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -121,7 +121,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         // Open ASiC-S container containing DDOC and timestamp which service is withdrawn
-        String filepath = "src\\test\\resources\\files\\ValidDDOCinsideAsics.asics";
+        String filepath = "src/test/resources/files/ValidDDOCinsideAsics.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
 //         Validate container

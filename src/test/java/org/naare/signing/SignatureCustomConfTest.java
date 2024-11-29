@@ -20,7 +20,7 @@ import static org.naare.signing.Helpers.getDefaultPkcs11SignatureToken;
 
 public class SignatureCustomConfTest {
 
-    String outputFolder = "src\\test\\resources\\output\\customConf\\";
+    String outputFolder = "src/test/resources/output/customConf/";
 
     @Test
     public void signWithCustomAiaSource() throws IOException {

@@ -123,7 +123,7 @@ class ExtensionOcspSourceTest {
         configuration.setExtendingOcspSourceFactory(() -> null);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_ocsp_cert_expired.asice", configuration);
         // Check expected test container was prepared
         assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
@@ -152,7 +152,7 @@ class ExtensionOcspSourceTest {
         configuration.setExtendingOcspSourceFactory(() -> source);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_ocsp_cert_expired.asice", configuration);
         // Check expected test container was prepared
         assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
@@ -178,7 +178,7 @@ class ExtensionOcspSourceTest {
         configuration.setExtendingOcspSourceFactory(() -> null);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_aia-ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_aia-ocsp_cert_expired.asice", configuration);
         // Check expected test container was prepared
         assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
@@ -198,7 +198,7 @@ class ExtensionOcspSourceTest {
         // Simulating DSS validation by setting constraint RevocationIssuerNotExpired=FAIL
         configuration.setValidationPolicy("conf/test_constraint_RevocationIssuerNotExpired_FAIL.xml");
         Container container2 = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_aia-ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_aia-ocsp_cert_expired.asice", configuration);
         container2.extendSignatureProfile(toProfile);
         ContainerValidationResult result2 = container2.validate();
         assertAll(
@@ -222,7 +222,7 @@ class ExtensionOcspSourceTest {
         configuration.setExtendingOcspSourceFactory(() -> source);
 
         Container container = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_aia-ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_aia-ocsp_cert_expired.asice", configuration);
         // Check expected test container was prepared
         assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
         assertEquals(1, ((AsicSignature) container.getSignatures().get(0)).getOrigin().getOcspResponses().size());
@@ -244,7 +244,7 @@ class ExtensionOcspSourceTest {
         // Simulating DSS validation by setting constraint RevocationIssuerNotExpired=FAIL
         configuration.setValidationPolicy("conf/test_constraint_RevocationIssuerNotExpired_FAIL.xml");
         Container container2 = ContainerOpener
-                .open("src\\test\\resources\\files\\asice_aia-ocsp_cert_expired.asice", configuration);
+                .open("src/test/resources/files/asice_aia-ocsp_cert_expired.asice", configuration);
         container2.extendSignatureProfile(toProfile);
         validationResultHasNoIssues(container2.validate());
     }
