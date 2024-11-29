@@ -30,20 +30,12 @@ public class Helpers {
                 .build();
     }
 
-    public static CompositeContainer buildCompositeAsicsContainer(String nestedContainerPath, Configuration config) {
-        return new AsicSCompositeContainer(
-                ContainerOpener.open(nestedContainerPath, config),
-                Paths.get(nestedContainerPath).getFileName().toString(),
-                config
-        );
-    }
-
     public static PKCS11SignatureToken getDefaultPkcs11SignatureToken(String PinCode) {
-        return new PKCS11SignatureToken("C:\\Program Files\\IDEMIA\\AWP\\DLLs\\OcsCryptoki.dll", PinCode.toCharArray(), 1);
+        return new PKCS11SignatureToken("C:/Program Files/IDEMIA/AWP/DLLs/OcsCryptoki.dll", PinCode.toCharArray(), 1);
     }
 
     public static PKCS12SignatureToken getDefaultPkcs12SignatureToken(String PinCode) {
-        return new PKCS12SignatureToken("src\\test\\resources\\keystores\\sign_ECC_from_TEST_of_ESTEID2018.p12", PinCode.toCharArray());
+        return new PKCS12SignatureToken("src/test/resources/keystores/sign_ECC_from_TEST_of_ESTEID2018.p12", PinCode.toCharArray());
     }
 
     public static DataToSign getDataToSign(Container container, SignatureToken token, SignatureProfile profile) {
@@ -81,7 +73,7 @@ public class Helpers {
 //            e.printStackTrace();
 //        }
 
-        String filePath = String.format("src\\test\\resources\\output\\%s_%d.%s",
+        String filePath = String.format("src/test/resources/output/%s_%d.%s",
                 callerMethodName,
                 new DateTime().getMillis(),
                 container.getType().toLowerCase());
@@ -89,7 +81,7 @@ public class Helpers {
     }
 
     public static void saveContainer(Container container, String filename) {
-        String filePath = String.format("src\\test\\resources\\output\\%s_%d.%s",
+        String filePath = String.format("src/test/resources/output/%s_%d.%s",
                 filename,
                 new DateTime().getMillis(),
                 container.getType().toLowerCase());

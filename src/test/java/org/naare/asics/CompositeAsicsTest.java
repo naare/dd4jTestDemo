@@ -1,7 +1,6 @@
 package org.naare.asics;
 
 import org.digidoc4j.*;
-import org.digidoc4j.impl.asic.asics.AsicSCompositeContainer;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -18,15 +17,17 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src\\test\\resources\\files\\Test_ASICS.asics";
+        String filepath = "src/test/resources/files/Test_ASICS.asics";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
+                .buildTimestamped(timestampBuilder -> {});
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
         assertEquals(1, container.getNestingContainerDataFiles().size());
         assertEquals(0, container.getNestingContainerSignatures().size());
-        assertEquals(0, container.getNestingContainerTimestamps().size());
+        assertEquals(1, container.getNestingContainerTimestamps().size());
         assertEquals(1, container.getNestedContainerDataFiles().size());
         assertEquals(0, container.getNestedContainerSignatures().size());
         assertEquals(1, container.getNestedContainerTimestamps().size());
@@ -36,13 +37,19 @@ class CompositeAsicsTest {
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
         assertEquals(0, result.getSignatureReports().size());
-        assertEquals(1, result.getTimestampReports().size());
+        assertEquals(2, result.getTimestampReports().size());
 
-        // Validate timestamp
-        String timestampId = result.getTimestampReports().get(0).getUniqueId();
+        // Validate timestamps
+        // Nested ASIC-S original timestamp
+        String timestampId = nestedContainer.getTimestamps().get(0).getUniqueId();
         assertTrue((result.getValidationResult(timestampId).isValid()));
-        assertEquals(timestampId, nestedContainer.getTimestamps().get(0).getUniqueId());
+        assertEquals(timestampId, result.getTimestampReports().get(0).getUniqueId());
         assertEquals(timestampId, container.getNestedContainerTimestamps().get(0).getUniqueId());
+        // Nesting ASIC-S added timestamp
+        String timestampId2 = container.getTimestamps().get(0).getUniqueId();
+        assertTrue((result.getValidationResult(timestampId2).isValid()));
+        assertEquals(timestampId2, result.getTimestampReports().get(1).getUniqueId());
+        assertEquals(timestampId2, container.getNestingContainerTimestamps().get(0).getUniqueId());
 
         System.out.println(result.getReport());
 
@@ -55,15 +62,17 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src\\test\\resources\\files\\TEST_ESTEID2018_ASiC-S_XAdES_LT.scs";
+        String filepath = "src/test/resources/files/TEST_ESTEID2018_ASiC-S_XAdES_LT.scs";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
+                .buildTimestamped(timestampBuilder -> {});
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
         assertEquals(1, container.getNestingContainerDataFiles().size());
         assertEquals(0, container.getNestingContainerSignatures().size());
-        assertEquals(0, container.getNestingContainerTimestamps().size());
+        assertEquals(1, container.getNestingContainerTimestamps().size());
         assertEquals(1, container.getNestedContainerDataFiles().size());
         assertEquals(1, container.getNestedContainerSignatures().size());
         assertEquals(0, container.getNestedContainerTimestamps().size());
@@ -73,7 +82,7 @@ class CompositeAsicsTest {
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
         assertEquals(1, result.getSignatureReports().size());
-        assertEquals(0, result.getTimestampReports().size());
+        assertEquals(1, result.getTimestampReports().size());
 
         // Validate signature
         String signatureId = result.getSignatureReports().get(0).getUniqueId();
@@ -81,36 +90,11 @@ class CompositeAsicsTest {
         assertEquals(signatureId, nestedContainer.getSignatures().get(0).getUniqueId());
         assertEquals(signatureId, container.getNestedContainerSignatures().get(0).getUniqueId());
 
-        System.out.println(result.getReport());
-
-        // Save container
-//        saveContainer(container);
-    }
-
-    @Test
-    void createCompositeAsicsWithAsiceAndValidate() {
-
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
-
-        String filepath = "src\\test\\resources\\files\\TEST_ESTEID2018_ASiC-E_XAdES_LT.sce";
-        Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
-
-        // Check nesting
-        assertEquals("ASICE", container.getNestedContainerType());
-        assertEquals(1, container.getNestingContainerDataFiles().size());
-        assertEquals(0, container.getNestingContainerSignatures().size());
-        assertEquals(0, container.getNestingContainerTimestamps().size());
-        assertEquals(1, container.getNestedContainerDataFiles().size());
-        assertEquals(1, container.getNestedContainerSignatures().size());
-        assertEquals(0, container.getNestedContainerTimestamps().size());
-        checkCompositeContainerNesting(container, nestedContainer);
-
-        // Validate container
-        ContainerValidationResult result = container.validate();
-        validationResultHasNoIssues(result);
-        assertEquals(1, result.getSignatureReports().size());
-        assertEquals(0, result.getTimestampReports().size());
+        // Validate nesting ASIC-S added timestamp
+        String timestampId = container.getTimestamps().get(0).getUniqueId();
+        assertTrue((result.getValidationResult(timestampId).isValid()));
+        assertEquals(timestampId, result.getTimestampReports().get(0).getUniqueId());
+        assertEquals(timestampId, container.getNestingContainerTimestamps().get(0).getUniqueId());
 
         System.out.println(result.getReport());
 
@@ -119,15 +103,16 @@ class CompositeAsicsTest {
     }
 
     @Test
-    void createCompositeAsicsWithAsicsAndValidate_addedTimestamps() {
+    void createCompositeAsicsWithAsicsAndValidate_addedTimestampToNestedContainer() {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src\\test\\resources\\files\\Test_ASICS.asics";
+        String filepath = "src/test/resources/files/Test_ASICS.asics";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         nestedContainer.addTimestamp(TimestampBuilder.aTimestamp(nestedContainer).invokeTimestamping());
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
-        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
+                .buildTimestamped(timestampBuilder -> {});
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
@@ -169,14 +154,15 @@ class CompositeAsicsTest {
     }
 
     @Test
-    void createCompositeAsicsWithAsiceAndValidate_addedTimestamps() {
+    void createCompositeAsicsWithAsiceAndValidate() {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src\\test\\resources\\files\\TEST_ESTEID2018_ASiC-E_XAdES_LT.sce";
+        String filepath = "src/test/resources/files/TEST_ESTEID2018_ASiC-E_XAdES_LT.sce";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
-        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
+                .buildTimestamped(timestampBuilder -> {});
 
         // Check nesting
         assertEquals("ASICE", container.getNestedContainerType());
@@ -207,14 +193,15 @@ class CompositeAsicsTest {
     }
 
     @Test
-    void createCompositeAsicsWithDdocAndValidate_addedTimestamps() {
+    void createCompositeAsicsWithDdocAndValidate() {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src\\test\\resources\\files\\DIGIDOC-XML1.3.ddoc";
+        String filepath = "src/test/resources/files/DIGIDOC-XML1.3.ddoc";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
-        CompositeContainer container = new AsicSCompositeContainer(nestedContainer, Paths.get(filepath).getFileName().toString(), configuration);
-        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
+                .buildTimestamped(timestampBuilder -> {});
 
         // Check nesting
         assertEquals("DDOC", container.getNestedContainerType());
