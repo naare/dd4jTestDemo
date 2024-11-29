@@ -30,14 +30,6 @@ public class Helpers {
                 .build();
     }
 
-    public static CompositeContainer buildCompositeAsicsContainer(String nestedContainerPath, Configuration config) {
-        return new AsicSCompositeContainer(
-                ContainerOpener.open(nestedContainerPath, config),
-                Paths.get(nestedContainerPath).getFileName().toString(),
-                config
-        );
-    }
-
     public static PKCS11SignatureToken getDefaultPkcs11SignatureToken(String PinCode) {
         return new PKCS11SignatureToken("C:/Program Files/IDEMIA/AWP/DLLs/OcsCryptoki.dll", PinCode.toCharArray(), 1);
     }

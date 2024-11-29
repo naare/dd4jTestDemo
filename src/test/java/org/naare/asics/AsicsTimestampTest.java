@@ -48,12 +48,11 @@ class AsicsTimestampTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        // Create composite ASiC-S container
-        CompositeContainer container = buildCompositeAsicsContainer(
-                "src/test/resources/files/Test_ASICS.asics", configuration);
-
-        // Add timestamp
-        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        // Create timestamped composite ASiC-S container
+        CompositeContainer container = CompositeContainerBuilder
+                .fromContainerFile("src/test/resources/files/Test_ASICS.asics")
+                .withConfiguration(configuration)
+                .buildTimestamped(timestampBuilder -> {});
 
         // Validate container
         ContainerValidationResult result = container.validate();
