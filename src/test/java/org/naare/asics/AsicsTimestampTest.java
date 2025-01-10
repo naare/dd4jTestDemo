@@ -29,7 +29,7 @@ class AsicsTimestampTest {
                 .withConfiguration(configuration)
                 // Set datafile and its mimetype
                 .withDataFile("src/test/resources/files/test.txt", "text/plain")
-//                .withDataFile("src/test/resources/files/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
+//                .withDataFile("src/test/resources/files/test/asics/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
                 .build();
 
         // Add timestamp
@@ -54,7 +54,7 @@ class AsicsTimestampTest {
 
         // Create timestamped composite ASiC-S container
         CompositeContainer container = CompositeContainerBuilder
-                .fromContainerFile("src/test/resources/files/Test_ASICS.asics")
+                .fromContainerFile("src/test/resources/files/test/asics/Test_ASICS.asics")
                 .withConfiguration(configuration)
                 .buildTimestamped(timestampBuilder -> {
                 });
@@ -77,7 +77,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing datafile ASiC-S container
-        String filepath = "src/test/resources/files/Test_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/Test_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -101,7 +101,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing composite ASiC-S container
-        String filepath = "src/test/resources/files/TEST_composite_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/TEST_composite_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -123,12 +123,12 @@ class AsicsTimestampTest {
     @ValueSource(strings = {
             "ValidDDOCinsideAsics",
             "asicsWithTsExpiredAndWithdrawn"})
-    void timestampAsics_withDdocAndWithdrawnTs_validatesWithWarning(String fileName) {
+    void timestampAsics_withTsExpiredAndWithdrawnInTsl_validatesWithWarning(String fileName) {
 
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         // Open ASiC-S container with expired timestamp which service is withdrawn in TSL
-        String filepath = "src/test/resources/files/" + fileName + ".asics";
+        String filepath = "src/test/resources/files/live/asics/" + fileName + ".asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Validate container
@@ -271,7 +271,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open ASiC-S container with expired timestamp which service is granted in TSL
-        String filepath = "src/test/resources/files/asicsWithTsExpiredButGranted.asics";
+        String filepath = "src/test/resources/files/test/asics/asicsWithTsExpiredButGranted.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Validate container
@@ -296,7 +296,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open ASiC-S container with broken timestamp
-        String filepath = "src/test/resources/files/1xTST-valid-bdoc-data-file-hash-failure-in-tst.asics";
+        String filepath = "src/test/resources/files/test/asics/1xTST-valid-bdoc-data-file-hash-failure-in-tst.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         String timestampId = container.getTimestamps().get(0).getUniqueId();
@@ -313,7 +313,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open ASiC-S container with one valid and one invalid timestamp
-        String filepath = "src/test/resources/files/2xTST-text-data-file-hash-failure-since-2nd-tst.asics";
+        String filepath = "src/test/resources/files/test/asics/2xTST-text-data-file-hash-failure-since-2nd-tst.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp

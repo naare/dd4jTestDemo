@@ -17,7 +17,7 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src/test/resources/files/Test_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/Test_ASICS.asics";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
@@ -62,7 +62,7 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src/test/resources/files/TEST_ESTEID2018_ASiC-S_XAdES_LT.scs";
+        String filepath = "src/test/resources/files/test/asics/TEST_ESTEID2018_ASiC-S_XAdES_LT.scs";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
@@ -107,7 +107,7 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src/test/resources/files/Test_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/Test_ASICS.asics";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         nestedContainer.addTimestamp(TimestampBuilder.aTimestamp(nestedContainer).invokeTimestamping());
         CompositeContainer container = CompositeContainerBuilder

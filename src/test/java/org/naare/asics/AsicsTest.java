@@ -20,7 +20,7 @@ class AsicsTest {
                 .withConfiguration(configuration)
                 // Set datafile and its mimetype
                 .withDataFile("src/test/resources/files/test.txt", "text/plain")
-//                .withDataFile("src/test/resources/files/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
+//                .withDataFile("src/test/resources/files/test/asics/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
                 .build();
 
         // Validate container
