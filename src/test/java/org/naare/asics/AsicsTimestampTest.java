@@ -1,16 +1,20 @@
 package org.naare.asics;
 
+import eu.europa.esig.dss.enumerations.Indication;
 import eu.europa.esig.dss.enumerations.SignatureScopeType;
 import eu.europa.esig.dss.enumerations.TimestampQualification;
 import eu.europa.esig.dss.simplereport.jaxb.XmlSignatureScope;
 import org.digidoc4j.*;
 import org.digidoc4j.impl.asic.report.TimestampValidationReport;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.naare.signing.Helpers.*;
+import static org.naare.signing.Helpers.buildContainer;
+import static org.naare.signing.Helpers.validationResultHasNoIssues;
 
 class AsicsTimestampTest {
 
@@ -25,7 +29,7 @@ class AsicsTimestampTest {
                 .withConfiguration(configuration)
                 // Set datafile and its mimetype
                 .withDataFile("src/test/resources/files/test.txt", "text/plain")
-//                .withDataFile("src/test/resources/files/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
+//                .withDataFile("src/test/resources/files/test/asics/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
                 .build();
 
         // Add timestamp
@@ -50,9 +54,10 @@ class AsicsTimestampTest {
 
         // Create timestamped composite ASiC-S container
         CompositeContainer container = CompositeContainerBuilder
-                .fromContainerFile("src/test/resources/files/Test_ASICS.asics")
+                .fromContainerFile("src/test/resources/files/test/asics/Test_ASICS.asics")
                 .withConfiguration(configuration)
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Validate container
         ContainerValidationResult result = container.validate();
@@ -72,7 +77,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing datafile ASiC-S container
-        String filepath = "src/test/resources/files/Test_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/Test_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -96,7 +101,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing composite ASiC-S container
-        String filepath = "src/test/resources/files/TEST_composite_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/TEST_composite_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
@@ -114,24 +119,30 @@ class AsicsTimestampTest {
 //        saveContainer(container);
     }
 
-    @Test
-    void timestampAsics_withDdocAndWithdrawnTs_validatesWithWarning() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "ValidDDOCinsideAsics",
+            "asicsWithTsExpiredAndWithdrawn"})
+    void timestampAsics_withTsExpiredAndWithdrawnInTsl_validatesWithWarning(String fileName) {
 
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
-        // Open ASiC-S container containing DDOC and timestamp which service is withdrawn
-        String filepath = "src/test/resources/files/ValidDDOCinsideAsics.asics";
+        // Open ASiC-S container with expired timestamp which service is withdrawn in TSL
+        String filepath = "src/test/resources/files/live/asics/" + fileName + ".asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
-        // Check container validation returns warning
+        // Validate container
         ContainerValidationResult result = container.validate();
         assertTrue(result.isValid());
         assertEquals(0, result.getErrors().size());
         assertEquals(1, result.getWarnings().size());
         assertEquals(0, result.getContainerErrors().size());
         assertEquals(1, result.getContainerWarnings().size());
+        // Check container validation returns warnings
         assertTrue(result.getWarnings().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
         assertTrue(result.getContainerWarnings().get(0).getMessage().contains("Found a timestamp token not related to granted status. If not yet covered with a fresh timestamp token, this container might become invalid in the future."));
+        // Check that TimestampLevel has been lowered
+        assertEquals(TimestampQualification.TSA, result.getTimestampReports().get(0).getTimestampLevel().getValue());
 
         // Add timestamp
         container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
@@ -145,6 +156,8 @@ class AsicsTimestampTest {
         assertEquals(1, result.getContainerWarnings().size());
         assertTrue(result.getWarnings().get(0).getMessage().contains("The certificate is not related to a granted status at time-stamp lowest POE time!"));
         assertTrue(result.getContainerWarnings().get(0).getMessage().contains("Found a timestamp token not related to granted status. If not yet covered with a fresh timestamp token, this container might become invalid in the future."));
+        assertEquals(TimestampQualification.TSA, result.getTimestampReports().get(0).getTimestampLevel().getValue());
+        assertEquals(TimestampQualification.QTSA, result.getTimestampReports().get(1).getTimestampLevel().getValue());
 
         System.out.println(result.getReport());
 
@@ -251,5 +264,70 @@ class AsicsTimestampTest {
         assertEquals("test.txt", timestampScope3.getName());
         assertEquals(SignatureScopeType.FULL, timestampScope3.getScope());
         assertEquals("Full document", timestampScope3.getValue());
+    }
+
+    @Test
+    void timestampAsics_withTsExpiredButGrantedInTsl_validates() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with expired timestamp which service is granted in TSL
+        String filepath = "src/test/resources/files/test/asics/asicsWithTsExpiredButGranted.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
+        assertEquals(1, result.getTimestampReports().size());
+        // Check that TimestampLevel is not lowered
+        assertEquals(TimestampQualification.QTSA, result.getTimestampReports().get(0).getTimestampLevel().getValue());
+
+        // Add timestamp
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+
+        // Validate container
+        result = container.validate();
+        validationResultHasNoIssues(result);
+        assertEquals(2, result.getTimestampReports().size());
+
+    }
+
+    @Test
+    void timestampAsics_withBrokenTs_failsWithException() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with broken timestamp
+        String filepath = "src/test/resources/files/test/asics/1xTST-valid-bdoc-data-file-hash-failure-in-tst.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        String timestampId = container.getTimestamps().get(0).getUniqueId();
+
+        // Add timestamp
+        Exception exception = assertThrows(eu.europa.esig.dss.alert.exception.AlertException.class, () -> {
+            container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        });
+        assertTrue(exception.getMessage().contains("Broken timestamp(s) detected. [" + timestampId + ": Signature is not intact!]"));
+    }
+
+    @Test
+    void timestampAsics_withOneValidAndOneInvalidTs_validates() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with one valid and one invalid timestamp
+        String filepath = "src/test/resources/files/test/asics/2xTST-text-data-file-hash-failure-since-2nd-tst.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Add timestamp
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.isValid());
+        assertEquals(1, result.getErrors().size());
+        assertEquals(0, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+        // Check timestamp addition was successful
+        assertEquals(3, result.getTimestampReports().size());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(2).getIndication());
     }
 }
