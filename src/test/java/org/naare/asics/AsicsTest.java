@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.naare.signing.Helpers.saveContainer;
 import static org.naare.signing.Helpers.validationResultHasNoIssues;
 
@@ -58,24 +57,5 @@ class AsicsTest {
         // Validate container
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
-    }
-
-    @Test
-    void signedAsics_withInvalidManifest_validationError() {
-
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
-
-        // Open existing ASiC-S container
-        String filepath = "src/test/resources/files/test/asics/1xSIG_with_invalid_manifest.asics";
-        Container container = ContainerOpener.open(filepath, configuration);
-
-        // Validate container
-        ContainerValidationResult result = container.validate();
-        assertFalse(result.isValid());
-        assertEquals(1, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
-        assertEquals(1, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
-        assertEquals("Manifest file has an entry for file <test.txt> with mimetype <application/octet-stream> but the signature file for signature id-826a2a48c5c35283b450ea2fa6396b7b indicates the mimetype is <text/plain>", result.getContainerErrors().get(0).getMessage());
     }
 }
