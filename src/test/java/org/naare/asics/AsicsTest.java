@@ -2,6 +2,8 @@ package org.naare.asics;
 
 import org.digidoc4j.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.naare.signing.Helpers.saveContainer;
@@ -33,5 +35,27 @@ class AsicsTest {
 
         // Save container
 //        saveContainer(container);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Test_ASICS.asics", // Timestamped, with manifest
+            "1xTST_asics_no_manifest.asics", // Timestamped, no manifest
+            "0xSIG_0xTST_asics.asics", // No timestamp or signature, with manifest
+            "0xSIG_0xTST_asics_no_manifest.asics", // No timestamp or signature, no manifest
+            "TEST_ESTEID2018_ASiC-S_XAdES_LT.scs", // Signed, no manifest
+            "1xSIG_with_manifest.asics" // Signed, with manifest
+    })
+    void openAsicsAndValidate(String fileName) {
+
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open existing ASiC-S container
+        String filepath = "src/test/resources/files/test/asics/" + fileName;
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
     }
 }

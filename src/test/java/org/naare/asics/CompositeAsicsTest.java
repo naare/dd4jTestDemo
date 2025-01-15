@@ -158,7 +158,7 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src/test/resources/files/TEST_ESTEID2018_ASiC-E_XAdES_LT.sce";
+        String filepath = "src/test/resources/files/test/asice/TEST_ESTEID2018_ASiC-E_XAdES_LT.sce";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
