@@ -3,10 +3,12 @@ package org.naare.extension;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
 import eu.europa.esig.dss.spi.client.http.DataLoader;
 import org.digidoc4j.*;
+import org.digidoc4j.exceptions.CertificateValidationException;
 import org.digidoc4j.impl.CommonOCSPSource;
 import org.digidoc4j.impl.OcspDataLoaderFactory;
 import org.digidoc4j.impl.SKOnlineOCSPSource;
 import org.digidoc4j.impl.asic.AsicSignature;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,5 +249,25 @@ class ExtensionOcspSourceTest {
                 .open("src/test/resources/files/asice_aia-ocsp_cert_expired.asice", configuration);
         container2.extendSignatureProfile(toProfile);
         validationResultHasNoIssues(container2.validate());
+    }
+
+    // NOTE! When changing the certificate AIA-OCSP response status for this test, it MUST be changed back to "GOOD".
+    @Disabled("Disabled by default: needs certificate status manually changed in https://demo.sk.ee/upload_cert/index.php")
+    @Test
+    void extendLtToLta_whenOcspExpiredAndExtendingOcspSourceSetAndAiaReturnsNotGood_failsWithException() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        SKOnlineOCSPSource source = new CommonOCSPSource(configuration);
+        DataLoader loader = new OcspDataLoaderFactory(configuration).create();
+        source.setDataLoader(loader);
+        configuration.setExtendingOcspSourceFactory(() -> source);
+
+        String filepath = "src/test/resources/files/asice_aia-ocsp_cert_expired.asice";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        Exception exception = assertThrows(CertificateValidationException.class, () -> {
+            container.extendSignatureProfile(SignatureProfile.LTA);
+        });
+        assertTrue(exception.getMessage().contains("Certificate status is revoked"));
     }
 }
