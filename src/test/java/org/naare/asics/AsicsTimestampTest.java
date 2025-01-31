@@ -330,4 +330,88 @@ class AsicsTimestampTest {
         assertEquals(3, result.getTimestampReports().size());
         assertEquals(Indication.PASSED, result.getTimestampReports().get(2).getIndication());
     }
+
+    @Test
+    void validateTimestampAsics_firstTsInvalid_SecondTsValidButDatafileNotCovered_validatesWithWarning() {
+        Configuration configuration = Configuration.of(Configuration.Mode.PROD);
+
+        // Open ASiC-S container with first as invalid TS and second valid, but datafile not covered
+        String filepath = "src/test/resources/files/live/asics/2xTST-1st-invalid-2nd-does-not-cover-datafile.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.isValid());
+        assertEquals(1, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+        // Check timestamp indications are correct
+        assertEquals(2, result.getTimestampReports().size());
+        assertEquals(Indication.FAILED, result.getTimestampReports().get(0).getIndication());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(1).getIndication());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getWarnings().get(0).getMessage());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getTimestampReports().get(1).getWarnings().get(0));
+    }
+
+    @Test
+    void validateCompositeAsics_firstTsInvalid_SecondTsValidButDatafileNotCovered_validatesWithWarning() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with first as invalid TS and second valid, but datafile not covered
+        String filepath = "src/test/resources/files/test/asics/2xTST-valid-bdoc-data-file-1st-tst-invalid-2nd-tst-no-coverage.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.isValid());
+        assertEquals(1, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+        // Check timestamp indications are correct
+        assertEquals(2, result.getTimestampReports().size());
+        assertEquals(Indication.FAILED, result.getTimestampReports().get(0).getIndication());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(1).getIndication());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getWarnings().get(0).getMessage());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getTimestampReports().get(1).getWarnings().get(0));
+    }
+
+    @Test
+    void validateCompositeAsics_validTimestamps_LastTsDatafileNotCovered_validatesWithWarning() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with first as invalid TS and second valid, but datafile not covered
+        String filepath = "src/test/resources/files/test/asics/2xTST-both-valid-2nd-tst-not-covering-nested-container.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+        // Check timestamp indications are correct
+        assertEquals(3, result.getTimestampReports().size());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(0).getIndication());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(1).getIndication());
+        assertEquals(Indication.PASSED, result.getTimestampReports().get(2).getIndication());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getWarnings().get(0).getMessage());
+        assertEquals("The time-stamp token does not cover container datafile!", result.getTimestampReports().get(2).getWarnings().get(0));
+    }
+
+    @Test
+    void timestampAsics_noCoverageWarningIfTimestampScopeFull_validates() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open ASiC-S container with full scope timestamps
+        String filepath = "src/test/resources/files/test/asics/5xTST_validTimestamps_scopeFull.asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
+        assertEquals(5, result.getTimestampReports().size());
+    }
 }
