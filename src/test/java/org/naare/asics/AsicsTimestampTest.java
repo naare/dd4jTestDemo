@@ -381,7 +381,7 @@ class AsicsTimestampTest {
     void validateCompositeAsics_validTimestamps_LastTsDatafileNotCovered_validatesWithWarning() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        // Open ASiC-S container with first as invalid TS and second valid, but datafile not covered
+        // Open ASiC-S container with valid timestamps, but last does not cover datafile
         String filepath = "src/test/resources/files/test/asics/2xTST-both-valid-2nd-tst-not-covering-nested-container.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
