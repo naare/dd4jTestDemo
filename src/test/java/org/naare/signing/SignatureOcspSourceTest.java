@@ -24,8 +24,6 @@ class SignatureOcspSourceTest {
 
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, SignatureProfile.T);
-
-        assertEquals(SignatureProfile.T, container.getSignatures().get(0).getProfile());
     }
 
     @Test
@@ -39,9 +37,7 @@ class SignatureOcspSourceTest {
         DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
 
-        Exception exception = assertThrows(OCSPRequestFailedException.class, () -> {
-            dataToSign.finalize(signatureValue);
-        });
+        Exception exception = assertThrows(OCSPRequestFailedException.class, () -> dataToSign.finalize(signatureValue));
         assertTrue(exception.getMessage().contains("OCSP request failed"));
     }
 
@@ -57,7 +53,6 @@ class SignatureOcspSourceTest {
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, SignatureProfile.LT);
 
-        assertEquals(SignatureProfile.LT, container.getSignatures().get(0).getProfile());
         validationResultHasNoIssues(container.validate());
     }
 }

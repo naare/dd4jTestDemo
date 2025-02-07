@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.naare.signing.Helpers.*;
 
 
-public class SignatureCreationTest {
+class SignatureCreationTest {
 
     String outputFolderCreating = "src/test/resources/output/signatureCreation/";
     String outputFolderExisting = "src/test/resources/output/ExistingContainers/";
 
     @Test
-    public void signPkcs11WithDataToSign() {
+    void signPkcs11WithDataToSign() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Set dummy TSL refresh callback */
@@ -75,7 +75,7 @@ public class SignatureCreationTest {
     }
 
     @Test
-    public void signPkcs11WithDataToSignExistingContainer() {
+    void signPkcs11WithDataToSignExistingContainer() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Use AIA OCSP source (default true) */
@@ -103,7 +103,7 @@ public class SignatureCreationTest {
     }
 
     @Test
-    public void signPkcs12WithDataToSign() {
+    void signPkcs12WithDataToSign() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
@@ -125,7 +125,7 @@ public class SignatureCreationTest {
     }
 
     @Test
-    public void signPkcs12WithDataToSignExistingContainer() {
+    void signPkcs12WithDataToSignExistingContainer() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Use AIA OCSP source (default true) */
@@ -154,7 +154,7 @@ public class SignatureCreationTest {
 
     @Disabled("Disabled by default as need Proxy configuration")
     @Test
-    public void signUsingProxy() {
+    void signUsingProxy() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Proxy settings */
@@ -187,7 +187,7 @@ public class SignatureCreationTest {
 
     @Disabled("Disabled by default: needs LIVE ID card, access to TS service (nortal VPN)")
     @Test
-    public void signWithCustomTSL() {
+    void signWithCustomTSL() {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom TSL */
@@ -211,7 +211,7 @@ public class SignatureCreationTest {
 
     @Disabled("Disabled by default as uses PROD mode, can be used with LIVE ID card and it´s PIN code")
     @Test
-    public void signWithCustomLotlTruststore() {
+    void signWithCustomLotlTruststore() {
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
         /* Set custom LOTL Truststore*/
@@ -243,7 +243,6 @@ public class SignatureCreationTest {
         SignPkcs12(container, signatureProfile);
 
         assertEquals(1, container.getSignatures().size());
-        assertEquals(signatureProfile, container.getSignatures().get(0).getProfile());
         ContainerValidationResult result = container.validate();
         assertTrue(result.getReport().contains("SignatureFormat=\"XAdES-BASELINE-" +
                 (signatureProfile == SignatureProfile.B_BES ? "B" : signatureProfile) + "\""));

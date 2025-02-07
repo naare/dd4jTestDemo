@@ -1,16 +1,12 @@
 package org.naare.signing;
 
 import org.digidoc4j.*;
-import org.digidoc4j.impl.asic.asics.AsicSCompositeContainer;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.digidoc4j.signers.PKCS12SignatureToken;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Helpers {
 
@@ -47,11 +43,16 @@ public class Helpers {
     }
 
     public static void SignPkcs12(Container container, SignatureProfile signatureProfile) {
+        int signaturesCount = container.getSignatures().size();
+
         PKCS12SignatureToken signatureToken = getDefaultPkcs12SignatureToken("1234");
         DataToSign dataToSign = getDataToSign(container, signatureToken, signatureProfile);
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
         org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
         container.addSignature(signature);
+
+        assertEquals(signaturesCount + 1, container.getSignatures().size());
+        assertEquals(signatureProfile, container.getSignatures().get(container.getSignatures().size() - 1).getProfile());
     }
 
     public static String getDateTime() {
@@ -59,7 +60,7 @@ public class Helpers {
         return time.toString("dMMy_") + time.getMillisOfDay();
     }
 
-    public static void saveContainer(Container container) {
+    public static String saveContainer(Container container) {
 
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         String callerMethodName = stackTrace[2].getMethodName();
@@ -78,6 +79,8 @@ public class Helpers {
                 new DateTime().getMillis(),
                 container.getType().toLowerCase());
         container.saveAsFile(filePath);
+
+        return filePath;
     }
 
     public static void saveContainer(Container container, String filename) {

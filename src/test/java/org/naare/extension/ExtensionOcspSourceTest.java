@@ -17,7 +17,7 @@ import static org.naare.signing.Helpers.*;
 class ExtensionOcspSourceTest {
 
     @Test
-    void extendBToT_whenExtendingOcspSourceSetNull_Pass() {
+    void extendBToT_whenExtendingOcspSourceSetNull_pass() {
         SignatureProfile fromProfile = SignatureProfile.B_BES;
         SignatureProfile toProfile = SignatureProfile.T;
 
@@ -27,7 +27,6 @@ class ExtensionOcspSourceTest {
         // Create container with B profile signature
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
-        assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
         // Extend signature profile
         container.extendSignatureProfile(toProfile);
@@ -37,7 +36,7 @@ class ExtensionOcspSourceTest {
     }
 
     @Test
-    void extendTToLt_whenExtendingOcspSourceSetNull_Fail() {
+    void extendTToLt_whenExtendingOcspSourceSetNull_fail() {
         SignatureProfile fromProfile = SignatureProfile.T;
         SignatureProfile toProfile = SignatureProfile.LT;
 
@@ -47,8 +46,6 @@ class ExtensionOcspSourceTest {
         // Create container with T profile signature
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
-        // Check expected test container was prepared
-        assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
         // Extend signature profile
         container.extendSignatureProfile(toProfile);
@@ -62,7 +59,7 @@ class ExtensionOcspSourceTest {
     }
 
     @Test
-    void extendLtToLta_whenExtendingOcspSourceSetNull_Pass() {
+    void extendLtToLta_whenExtendingOcspSourceSetNull_pass() {
         SignatureProfile fromProfile = SignatureProfile.LT;
         SignatureProfile toProfile = SignatureProfile.LTA;
 
@@ -72,7 +69,6 @@ class ExtensionOcspSourceTest {
         // Create container with LT profile signature
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
-        assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
 
         // Extend signature profile
         container.extendSignatureProfile(toProfile);
@@ -101,7 +97,6 @@ class ExtensionOcspSourceTest {
         // Create container with T profile signature
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
-        assertEquals(fromProfile, container.getSignatures().get(0).getProfile());
         assertEquals(0, ((AsicSignature) container.getSignatures().get(0)).getOrigin().getOcspResponses().size());
 
         // Extend signature profile

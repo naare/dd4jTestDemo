@@ -111,7 +111,7 @@ class TrustServiceLevelTest {
     void signAsiceAndValidate_timestampTrustServiceLevel(String levels) {
         List<String> levelsList = Arrays.asList(levels.split(","));
         String sigTsLevel = levelsList.get(0);
-        boolean sigTsValid = "QTSA".equals(sigTsLevel);
+        boolean sigTsValid = sigTsLevel.equals("QTSA");
         List<String> archiveTsLevels = levelsList.size() >= 2 ? levelsList.subList(1, levelsList.size()) : Collections.emptyList();
 
         // Create signed ASiC-E container
