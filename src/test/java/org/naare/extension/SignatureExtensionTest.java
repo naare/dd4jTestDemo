@@ -2,6 +2,7 @@ package org.naare.extension;
 
 import eu.europa.esig.dss.alert.exception.AlertException;
 import eu.europa.esig.dss.enumerations.SignatureLevel;
+import eu.europa.esig.dss.model.DSSException;
 import org.digidoc4j.*;
 import org.digidoc4j.exceptions.DigiDoc4JException;
 import org.digidoc4j.impl.asic.AsicContainer;
@@ -162,39 +163,49 @@ class SignatureExtensionTest {
     }
 
     @Test
-    void extensionValidation_containerWithOneInvalidSignature_fail() {
-        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
-
-        // Open existing ASiC-E container
-        String filepath = "src/test/resources/files/test/asice/asice_single_signature_with_expired_signer_and_ts_and_ocsp_certificates.asice";
-        Container container = ContainerOpener.open(filepath, configuration);
-
-        Map<String, DigiDoc4JException> validationErrors = ((AsicContainer) container)
-                .getExtensionValidationErrors(SignatureProfile.LTA);
-        assertEquals(1, validationErrors.size());
-
+    void extensionValidation_withExpiredSignature_alertException() {
         String expectedError = "Expired signature found. [S-D56EB97126A7FAEE1D3BBEB2BC63D077B557D1BB1D203B5121E5F7904B3109C9: The signing certificate has expired and there is no POE during its validity range : [2016-04-13T11:20:28Z - 2021-04-12T20:59:59Z]!]";
-        DigiDoc4JException validationError = validationErrors.get(container.getSignatures().get(0).getUniqueId());
-        assertEquals("Validating the signature with DSS failed", validationError.getMessage());
-        assertEquals(expectedError, validationError.getCause().getMessage());
-    }
-
-    @Test
-    void extensionValidationErrorMatchesExtensionError() {
         SignatureProfile toProfile = SignatureProfile.LTA;
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        // Open existing ASiC-E container
+        // Open existing ASiC-E container with expired signature
         String filepath = "src/test/resources/files/test/asice/asice_single_signature_with_expired_signer_and_ts_and_ocsp_certificates.asice";
-        Container container = ContainerOpener.open(filepath, configuration);
+        AsicContainer container = (AsicContainer) ContainerOpener.open(filepath, configuration);
 
-        Map<String, DigiDoc4JException> validationErrors = ((AsicContainer) container).getExtensionValidationErrors(toProfile);
+        Map<String, DigiDoc4JException> validationErrors = container.getExtensionValidationErrors(toProfile);
+        assertEquals(1, validationErrors.size());
+
         DigiDoc4JException validationError = validationErrors.get(container.getSignatures().get(0).getUniqueId());
+        assertEquals("Validating the signature with DSS failed", validationError.getMessage());
+        assertEquals(AlertException.class, validationError.getCause().getClass());
+        assertEquals(expectedError, validationError.getCause().getMessage());
 
-        // Extend signature profile
+        // Try extending signature profile
         Exception exception = assertThrows(AlertException.class, () -> container.extendSignatureProfile(toProfile));
-        assertEquals(validationError.getCause().getClass(), exception.getClass());
-        assertEquals(validationError.getCause().getMessage(), exception.getMessage());
+        assertEquals(expectedError, exception.getMessage());
+    }
+
+    @Test
+    void extensionValidation_withSignatureNotCoveringDatafile_dssException() {
+        String expectedError = "Cryptographic signature verification has failed / Signature verification failed against the best candidate.";
+        SignatureProfile toProfile = SignatureProfile.LTA;
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open existing ASiC-E container with signature not covering datafile
+        String filepath = "src/test/resources/files/test/asice/signature_does_not_cover_datafile.asice";
+        AsicContainer container = (AsicContainer) ContainerOpener.open(filepath, configuration);
+
+        Map<String, DigiDoc4JException> validationErrors = container.getExtensionValidationErrors(toProfile);
+        assertEquals(1, validationErrors.size());
+
+        DigiDoc4JException validationError = validationErrors.get(container.getSignatures().get(0).getUniqueId());
+        assertEquals("Validating the signature with DSS failed", validationError.getMessage());
+        assertEquals(DSSException.class, validationError.getCause().getClass());
+        assertEquals(expectedError, validationError.getCause().getMessage());
+
+        // Try extending signature profile
+        Exception exception = assertThrows(DSSException.class, () -> container.extendSignatureProfile(toProfile));
+        assertEquals(expectedError, exception.getMessage());
     }
 
     @ParameterizedTest
