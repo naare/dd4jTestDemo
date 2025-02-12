@@ -83,12 +83,12 @@ class SignatureTspSourceTest {
 
         AsicSignature signature = (AsicSignature) container.getSignatures().get(0);
         // Check signature timestamp
-        assertEquals("TEST of SK TSA CA 2023R", signature.getTimeStampTokenCertificate().issuerName(X509Cert.Issuer.CN));
+        assertTrue(signature.getTimeStampTokenCertificate().getSubjectName().contains("CN=DEMO SK TIMESTAMPING UNIT 2025R"));
 
         List<TimestampToken> archiveTimestamps = signature.getOrigin().getDssSignature().getArchiveTimestamps();
         // Check archive timestamp
         assertTrue(archiveTimestamps.get(0).getTimeStamp().getTimeStampInfo().getTsa().getName().toString()
-                .contains("CN=DEMO SK TIMESTAMPING AUTHORITY 2023E"));
+                .contains("CN=DEMO SK TIMESTAMPING UNIT 2025E"));
     }
 
     @Test
@@ -106,11 +106,41 @@ class SignatureTspSourceTest {
 
         AsicSignature signature = (AsicSignature) container.getSignatures().get(0);
         // Check signature timestamp
-        assertEquals("TEST of SK TSA CA 2023E", signature.getTimeStampTokenCertificate().issuerName(X509Cert.Issuer.CN));
+        assertTrue(signature.getTimeStampTokenCertificate().getSubjectName().contains("CN=DEMO SK TIMESTAMPING UNIT 2025E"));
 
         List<TimestampToken> archiveTimestamps = signature.getOrigin().getDssSignature().getArchiveTimestamps();
         // Check archive timestamp
         assertTrue(archiveTimestamps.get(0).getTimeStamp().getTimeStampInfo().getTsa().getName().toString()
-                .contains("CN=DEMO SK TIMESTAMPING AUTHORITY 2023R"));
+                .contains("CN=DEMO SK TIMESTAMPING UNIT 2025R"));
+    }
+
+    @Test
+    void sign_withBaltstampSignatureTspSource() {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+        configuration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+
+        // Set custom TSP source
+        TestTSPSource tspSource = new TestTSPSource();
+        tspSource.setTspServer("http://tsa.baltstamp.lt");
+        configuration.setSignatureTspSourceFactory(() -> tspSource);
+
+        // Create signed container
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+        SignPkcs12(container, SignatureProfile.LT);
+
+        AsicSignature signature = (AsicSignature) container.getSignatures().get(0);
+        // Check signature timestamp
+        assertTrue(signature.getTimeStampTokenCertificate().getSubjectName().contains("CN=BalTstamp QTSA TSU1"));
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        assertTrue(result.isValid());
+        assertEquals(0, result.getErrors().size());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(0, result.getContainerErrors().size());
+        assertEquals(0, result.getContainerWarnings().size());
+
+        // Baltstamp specific issue?
+        assertTrue(result.getWarnings().get(0).getMessage().contains("The signed attribute: 'signing-certificate' is present more than once!"));
     }
 }

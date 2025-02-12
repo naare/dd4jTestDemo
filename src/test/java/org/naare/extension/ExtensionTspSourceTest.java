@@ -1,6 +1,7 @@
 package org.naare.extension;
 
 import eu.europa.esig.dss.spi.client.http.DataLoader;
+import eu.europa.esig.dss.spi.x509.tsp.TimestampToken;
 import org.digidoc4j.Configuration;
 import org.digidoc4j.Container;
 import org.digidoc4j.ContainerValidationResult;
@@ -8,11 +9,13 @@ import org.digidoc4j.SignatureProfile;
 import org.digidoc4j.impl.CommonOCSPSource;
 import org.digidoc4j.impl.OcspDataLoaderFactory;
 import org.digidoc4j.impl.SKOnlineOCSPSource;
-import org.junit.jupiter.api.Disabled;
+import org.digidoc4j.impl.asic.AsicSignature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.naare.utils.TestTSPSource;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.naare.signing.Helpers.*;
@@ -101,7 +104,6 @@ class ExtensionTspSourceTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        // Create container with B profile signature
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
 
@@ -110,9 +112,14 @@ class ExtensionTspSourceTest {
         assertTrue(exception.getMessage().contains("The TSPSource cannot be null"));
     }
 
-    @Disabled("Requires manual validation")
-    @Test
-    void extendLtToLta_withCustomArchiveTspSource() {
+    @ParameterizedTest
+    @CsvSource({
+            "RSA, ECC",
+            "ECC, RSA",
+            "RSA, RSA",
+            "ECC, ECC",
+    })
+    void extendLtToLta_withChangingCustomArchiveTspSource(String first, String second) {
         SignatureProfile fromProfile = SignatureProfile.LT;
         SignatureProfile toProfile = SignatureProfile.LTA;
 
@@ -126,16 +133,14 @@ class ExtensionTspSourceTest {
         Container container = buildContainer(Container.DocumentType.ASICE, configuration);
         SignPkcs12(container, fromProfile);
 
-        // Set different TSP source server
-        tspSource.setTspServer("http://tsa.demo.sk.ee/tsarsa");
-//        tspSource.setTspServer("http://tsa.demo.sk.ee/tsaecc");
+        // Set first TSP source server
+        tspSource.setTspServer("http://tsa.demo.sk.ee/tsa" + first.toLowerCase());
 
         // Extend signature profile
         container.extendSignatureProfile(toProfile);
 
-        // Set different TSP source server
-        tspSource.setTspServer("http://tsa.demo.sk.ee/tsaecc");
-//        tspSource.setTspServer("http://tsa.demo.sk.ee/tsarsa");
+        // Set second TSP source server
+        tspSource.setTspServer("http://tsa.demo.sk.ee/tsa" + second.toLowerCase());
 
         // Extend signature profile
         container.extendSignatureProfile(toProfile);
@@ -143,9 +148,13 @@ class ExtensionTspSourceTest {
         // Validate container
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
-        assertEquals(toProfile, container.getSignatures().get(0).getProfile());
 
-        // Save container and check archive timestamps through SiVa demo
-        saveContainer(container);
+        AsicSignature signature = (AsicSignature) container.getSignatures().get(0);
+        List<TimestampToken> archiveTimestamps = signature.getOrigin().getDssSignature().getArchiveTimestamps();
+        // Check archive timestamp
+        assertTrue(archiveTimestamps.get(0).getTimeStamp().getTimeStampInfo().getTsa().getName().toString()
+                .contains("CN=DEMO SK TIMESTAMPING UNIT 2025" + first.charAt(0)));
+        assertTrue(archiveTimestamps.get(1).getTimeStamp().getTimeStampInfo().getTsa().getName().toString()
+                .contains("CN=DEMO SK TIMESTAMPING UNIT 2025" + second.charAt(0)));
     }
 }

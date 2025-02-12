@@ -1,6 +1,9 @@
 package org.naare.asics;
 
-import org.digidoc4j.*;
+import org.digidoc4j.Configuration;
+import org.digidoc4j.Container;
+import org.digidoc4j.ContainerValidationResult;
+import org.digidoc4j.TimestampBuilder;
 import org.junit.jupiter.api.Test;
 import org.naare.utils.TestTSPSource;
 
@@ -67,9 +70,7 @@ class AsicsTspSourceTest {
         validationResultHasNoIssues(result);
         assertEquals(2, result.getTimestampReports().size());
 
-        assertEquals("TEST of SK TSA CA 2023E",
-                container.getTimestamps().get(0).getCertificate().issuerName(X509Cert.Issuer.CN));
-        assertEquals("TEST of SK TSA CA 2023R",
-                container.getTimestamps().get(1).getCertificate().issuerName(X509Cert.Issuer.CN));
+        assertTrue(container.getTimestamps().get(0).getCertificate().getSubjectName().contains("CN=DEMO SK TIMESTAMPING UNIT 2025E"));
+        assertTrue(container.getTimestamps().get(1).getCertificate().getSubjectName().contains("CN=DEMO SK TIMESTAMPING UNIT 2025R"));
     }
 }
