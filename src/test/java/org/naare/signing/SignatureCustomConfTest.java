@@ -8,6 +8,7 @@ import org.digidoc4j.DataToSign;
 import org.digidoc4j.SignatureProfile;
 import org.digidoc4j.signers.PKCS11SignatureToken;
 import org.joda.time.DateTime;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class SignatureCustomConfTest {
 
         assertEquals(container.getSignatures().size(), 1);
     }
-
+    @Disabled ("Needs custom LOTL")
     @Test
     public void signWithCustomLOTL() throws IOException {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
@@ -87,7 +88,7 @@ public class SignatureCustomConfTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Required countries which TSL update must be successful */
-        configuration.setRequiredTerritories("EE");
+        configuration.setRequiredTerritories("EE_T");
 
         /* Invalidate DD4J TSL cache and force reload */
         configuration.getTSL().invalidateCache();
