@@ -192,7 +192,7 @@ class AsicsTimestampTest {
         TimestampValidationReport timestampValidationReport = result.getTimestampReports().get(0);
         assertEquals(TimestampQualification.QTSA, timestampValidationReport.getTimestampLevel().getValue());
         assertEquals("Qualified timestamp", timestampValidationReport.getTimestampLevel().getDescription());
-        assertEquals("DEMO SK TIMESTAMPING AUTHORITY 2023E", timestampValidationReport.getProducedBy());
+        assertEquals("DEMO SK TIMESTAMPING UNIT 2025E", timestampValidationReport.getProducedBy());
         assertTrue(timestampValidationReport.getProductionTime().getTime() - new Date().getTime() <= 1000);
         assertEquals(1, timestampValidationReport.getTimestampScope().size());
 
@@ -231,7 +231,7 @@ class AsicsTimestampTest {
         TimestampValidationReport timestampValidationReport = result.getTimestampReports().get(0);
         assertEquals(TimestampQualification.QTSA, timestampValidationReport.getTimestampLevel().getValue());
         assertEquals("Qualified timestamp", timestampValidationReport.getTimestampLevel().getDescription());
-        assertEquals("DEMO SK TIMESTAMPING AUTHORITY 2023E", timestampValidationReport.getProducedBy());
+        assertEquals("DEMO SK TIMESTAMPING UNIT 2025E", timestampValidationReport.getProducedBy());
         assertTrue(timestampValidationReport.getProductionTime().getTime() - new Date().getTime() <= 5000);
         assertEquals(1, timestampValidationReport.getTimestampScope().size());
 
@@ -245,7 +245,7 @@ class AsicsTimestampTest {
         TimestampValidationReport timestampValidationReport2 = result.getTimestampReports().get(1);
         assertEquals(TimestampQualification.QTSA, timestampValidationReport2.getTimestampLevel().getValue());
         assertEquals("Qualified timestamp", timestampValidationReport2.getTimestampLevel().getDescription());
-        assertEquals("DEMO SK TIMESTAMPING AUTHORITY 2023E", timestampValidationReport2.getProducedBy());
+        assertEquals("DEMO SK TIMESTAMPING UNIT 2025E", timestampValidationReport2.getProducedBy());
         assertTrue(timestampValidationReport.getProductionTime().getTime() - new Date().getTime() <= 5000);
         assertEquals(3, timestampValidationReport2.getTimestampScope().size());
 
