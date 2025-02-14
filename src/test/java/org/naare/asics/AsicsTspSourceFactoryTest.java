@@ -42,7 +42,7 @@ class AsicsTspSourceFactoryTest {
         // Timestamp the container
         TimestampBuilder timestampBuilder = TimestampBuilder.aTimestamp(container);
         Exception exception = assertThrows(NullPointerException.class, timestampBuilder::invokeTimestamping);
-        assertTrue(exception.getMessage().contains("TSP source cannot be null"));
+        assertEquals("TSP source cannot be null", exception.getMessage());
     }
 
     @Test

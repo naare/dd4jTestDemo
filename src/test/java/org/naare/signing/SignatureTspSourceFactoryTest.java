@@ -14,8 +14,7 @@ import org.naare.utils.TestTSPSource;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.naare.signing.Helpers.*;
 
 class SignatureTspSourceFactoryTest {
@@ -43,7 +42,7 @@ class SignatureTspSourceFactoryTest {
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
 
         Exception exception = assertThrows(NullPointerException.class, () -> dataToSign.finalize(signatureValue));
-        assertTrue(exception.getMessage().contains("The TSPSource cannot be null"));
+        assertEquals("The TSPSource cannot be null", exception.getMessage());
     }
 
     @ParameterizedTest
@@ -69,7 +68,7 @@ class SignatureTspSourceFactoryTest {
         byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
 
         Exception exception = assertThrows(NullPointerException.class, () -> dataToSign.finalize(signatureValue));
-        assertTrue(exception.getMessage().contains("The TSPSource cannot be null"));
+        assertEquals("The TSPSource cannot be null", exception.getMessage());
     }
 
     @Test

@@ -36,7 +36,7 @@ class ExtensionTspSourceFactoryTest {
         configuration.setSignatureTspSourceFactory(() -> null);
 
         Exception exception = assertThrows(NullPointerException.class, () -> container.extendSignatureProfile(toProfile));
-        assertTrue(exception.getMessage().contains("The TSPSource cannot be null"));
+        assertEquals("The TSPSource cannot be null", exception.getMessage());
     }
 
     @Test
@@ -109,7 +109,7 @@ class ExtensionTspSourceFactoryTest {
 
         configuration.setArchiveTspSourceFactory(() -> null);
         Exception exception = assertThrows(NullPointerException.class, () -> container.extendSignatureProfile(toProfile));
-        assertTrue(exception.getMessage().contains("The TSPSource cannot be null"));
+        assertEquals("The TSPSource cannot be null", exception.getMessage());
     }
 
     @Test
