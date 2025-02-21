@@ -22,7 +22,7 @@ class AsicsTest {
                 .withConfiguration(configuration)
                 // Set datafile and its mimetype
                 .withDataFile("src/test/resources/files/test.txt", "text/plain")
-//                .withDataFile("src/test/resources/files/test/asics/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
+//                .withDataFile("src/test/resources/files/test/asics/TEST_ASICS.asics", "application/vnd.etsi.asic-s+zip")
                 .build();
 
         // Validate container
@@ -39,7 +39,7 @@ class AsicsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "Test_ASICS.asics", // Timestamped, with manifest
+            "TEST_ASICS.asics", // Timestamped, with manifest
             "1xTST_asics_no_manifest.asics", // Timestamped, no manifest
             "0xSIG_0xTST_asics.asics", // No timestamp or signature, with manifest
             "0xSIG_0xTST_asics_no_manifest.asics", // No timestamp or signature, no manifest

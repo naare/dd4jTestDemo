@@ -29,7 +29,7 @@ class AsicsTimestampTest {
                 .withConfiguration(configuration)
                 // Set datafile and its mimetype
                 .withDataFile("src/test/resources/files/test.txt", "text/plain")
-//                .withDataFile("src/test/resources/files/test/asics/Test_ASICS.asics", "application/vnd.etsi.asic-s+zip")
+//                .withDataFile("src/test/resources/files/test/asics/TEST_ASICS.asics", "application/vnd.etsi.asic-s+zip")
                 .build();
 
         // Add timestamp
@@ -54,7 +54,7 @@ class AsicsTimestampTest {
 
         // Create timestamped composite ASiC-S container
         CompositeContainer container = CompositeContainerBuilder
-                .fromContainerFile("src/test/resources/files/test/asics/Test_ASICS.asics")
+                .fromContainerFile("src/test/resources/files/test/asics/TEST_ASICS.asics")
                 .withConfiguration(configuration)
                 .buildTimestamped(timestampBuilder -> {
                 });
@@ -77,7 +77,7 @@ class AsicsTimestampTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         // Open existing datafile ASiC-S container
-        String filepath = "src/test/resources/files/test/asics/Test_ASICS.asics";
+        String filepath = "src/test/resources/files/test/asics/TEST_ASICS.asics";
         Container container = ContainerOpener.open(filepath, configuration);
 
         // Add timestamp
