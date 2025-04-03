@@ -87,7 +87,7 @@ public class SignatureCustomConfTest {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
         /* Required countries which TSL update must be successful */
-        configuration.setRequiredTerritories("EE");
+        configuration.setRequiredTerritories("EE_T");
 
         /* Invalidate DD4J TSL cache and force reload */
         configuration.getTSL().invalidateCache();
