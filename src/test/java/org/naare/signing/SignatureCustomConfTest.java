@@ -4,6 +4,7 @@ import eu.europa.esig.dss.spi.client.http.DataLoader;
 import eu.europa.esig.dss.spi.x509.aia.AIASource;
 import org.digidoc4j.Configuration;
 import org.digidoc4j.Container;
+import org.digidoc4j.ContainerValidationResult;
 import org.digidoc4j.DataToSign;
 import org.digidoc4j.SignatureProfile;
 import org.digidoc4j.signers.PKCS11SignatureToken;
@@ -17,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.naare.signing.Helpers.buildContainer;
 import static org.naare.signing.Helpers.getDataToSign;
 import static org.naare.signing.Helpers.getDefaultPkcs11SignatureToken;
+import static org.naare.signing.Helpers.validationResultHasNoIssues;
 
 public class SignatureCustomConfTest {
 
@@ -106,5 +108,31 @@ public class SignatureCustomConfTest {
         container.saveAsFile(outputFolder + "TEST" + "_Custom_AIA_" + time.getMillis() + ".asice");
 
         assertEquals(container.getSignatures().size(), 1);
+    }
+
+    @Test
+    public void signWithTslV6_Succeeds() throws IOException {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+        /* TEST V6 TSL*/
+        configuration.setLotlLocation("TEST-LOTL-with-EE_T-v6-TEST-TSL");
+        /* Invalidate DD4J TSL cache and force reload */
+        configuration.getTSL().invalidateCache();
+        configuration.getTSL().refresh();
+
+        /* Build a container and sign it */
+        Container container = buildContainer(Container.DocumentType.ASICE, configuration);
+        PKCS11SignatureToken signatureToken = getDefaultPkcs11SignatureToken("12345");
+        DataToSign dataToSign = getDataToSign(container, signatureToken, SignatureProfile.LT);
+        byte[] signatureValue = signatureToken.sign(dataToSign.getDigestAlgorithm(), dataToSign.getDataToSign());
+        org.digidoc4j.Signature signature = dataToSign.finalize(signatureValue);
+        container.addSignature(signature);
+
+        /* Created signature is valid */
+        assertEquals(container.getSignatures().size(), 1);
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
+
+        // Save container
+//        saveContainer(container);
     }
 }
