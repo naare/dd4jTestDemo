@@ -10,11 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.naare.signing.Helpers.buildContainer;
-import static org.naare.signing.Helpers.validationResultHasNoIssues;
+import static org.naare.signing.Helpers.*;
 
 class AsicsTimestampTest {
 
@@ -413,5 +414,68 @@ class AsicsTimestampTest {
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
         assertEquals(5, result.getTimestampReports().size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "!#$%&'()+,-0123456789;=@ ",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~ ",
+            "£€§½ŠšŽžÕõÄäÖöÜü "})
+    void timestampCreatedDatafileAsics_withSpecialCharsInDatafileName_succeeds(String fileName) throws IOException {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Create a temporary .txt file with a custom filename
+        Path tempFile = Files.createTempFile(fileName, ".txt");
+        String fileContent = "This is a test content for " + fileName;
+        Files.write(tempFile, fileContent.getBytes(), StandardOpenOption.WRITE);
+
+        // Create datafile ASiC-S container
+        Container container = ContainerBuilder
+                .aContainer(Container.DocumentType.ASICS)
+                .withConfiguration(configuration)
+                // Set datafile and its mimetype
+                .withDataFile(tempFile.toString(), "text/plain")
+                .build();
+
+        // Add timestamps
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
+        assertEquals(0, result.getSignatureReports().size());
+        assertEquals(3, result.getTimestampReports().size());
+
+        // Save container
+        saveContainer(container);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2xTST-datafile-with-%20-percentencoded-in-archive-manifest",
+            "2xTST-datafile-with-plus-percentencoded-in-archive-manifest",
+            "2xTST-datafile-with-space-percentencoded-in-archive-manifest",
+            "2xTST-datafile-with-space-unencoded-in-archive-manifest",
+            "2xTST-datafile-with-plus-unencoded-in-archive-manifest"})
+    void timestampOpenedDatafileAsics_withSpaceOrPlusInDatafileName_succeeds(String fileName) {
+        Configuration configuration = Configuration.of(Configuration.Mode.TEST);
+
+        // Open existing datafile ASiC-S container
+        String filepath = "src/test/resources/files/test/asics/" + fileName + ".asics";
+        Container container = ContainerOpener.open(filepath, configuration);
+
+        // Add timestamps
+        container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
+
+        // Validate container
+        ContainerValidationResult result = container.validate();
+        validationResultHasNoIssues(result);
+        assertEquals(0, result.getSignatureReports().size());
+        assertEquals(3, result.getTimestampReports().size());
+
+        // Save container
+//        saveContainer(container);
     }
 }
