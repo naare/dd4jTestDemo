@@ -10,12 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.IOException;
-import java.nio.file.*;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.naare.signing.Helpers.*;
+import static org.naare.signing.Helpers.buildContainer;
+import static org.naare.signing.Helpers.validationResultHasNoIssues;
 
 class AsicsTimestampTest {
 
@@ -421,20 +422,19 @@ class AsicsTimestampTest {
             "!#$%&'()+,-0123456789;=@ ",
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{}~ ",
             "£€§½ŠšŽžÕõÄäÖöÜü "})
-    void timestampCreatedDatafileAsics_withSpecialCharsInDatafileName_succeeds(String fileName) throws IOException {
+    void timestampCreatedDatafileAsics_withSpecialCharsInDatafileName_succeeds(String fileName) {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        // Create a temporary .txt file with a custom filename
-        Path tempFile = Files.createTempFile(fileName, ".txt");
         String fileContent = "This is a test content for " + fileName;
-        Files.write(tempFile, fileContent.getBytes(), StandardOpenOption.WRITE);
 
-        // Create datafile ASiC-S container
         Container container = ContainerBuilder
                 .aContainer(Container.DocumentType.ASICS)
                 .withConfiguration(configuration)
-                // Set datafile and its mimetype
-                .withDataFile(tempFile.toString(), "text/plain")
+                .withDataFile(
+                        new ByteArrayInputStream(fileContent.getBytes(StandardCharsets.UTF_8)),
+                        fileName + ".txt",
+                        "text/plain"
+                )
                 .build();
 
         // Add timestamps
@@ -449,7 +449,7 @@ class AsicsTimestampTest {
         assertEquals(3, result.getTimestampReports().size());
 
         // Save container
-        saveContainer(container);
+//        saveContainer(container);
     }
 
     @ParameterizedTest
