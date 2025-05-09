@@ -52,7 +52,7 @@ class AsicsTspSourceTest {
         ContainerValidationResult result = container.validate();
         validationResultHasNoIssues(result);
         assertEquals(1, result.getTimestampReports().size());
-        assertTrue(container.getTimestamps().get(0).getCertificate().getSubjectName().contains("CN=SK TIMESTAMPING UNIT 2024E"));
+        assertTrue(container.getTimestamps().get(0).getCertificate().getSubjectName().contains("CN=SK TIMESTAMPING UNIT 2025E"));
     }
 
     @Test

@@ -21,7 +21,8 @@ class CompositeAsicsTest {
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
@@ -66,7 +67,8 @@ class CompositeAsicsTest {
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
@@ -112,7 +114,8 @@ class CompositeAsicsTest {
         nestedContainer.addTimestamp(TimestampBuilder.aTimestamp(nestedContainer).invokeTimestamping());
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Check nesting
         assertEquals("ASICS", container.getNestedContainerType());
@@ -162,7 +165,8 @@ class CompositeAsicsTest {
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Check nesting
         assertEquals("ASICE", container.getNestedContainerType());
@@ -197,11 +201,12 @@ class CompositeAsicsTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
 
-        String filepath = "src/test/resources/files/DIGIDOC-XML1.3.ddoc";
+        String filepath = "src/test/resources/files/valid_XML1_3.ddoc";
         Container nestedContainer = ContainerOpener.open(filepath, configuration);
         CompositeContainer container = CompositeContainerBuilder
                 .fromContainer(nestedContainer, Paths.get(filepath).getFileName().toString())
-                .buildTimestamped(timestampBuilder -> {});
+                .buildTimestamped(timestampBuilder -> {
+                });
 
         // Check nesting
         assertEquals("DDOC", container.getNestedContainerType());

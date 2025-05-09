@@ -129,6 +129,10 @@ class AsicsTimestampTest {
 
         Configuration configuration = Configuration.of(Configuration.Mode.PROD);
 
+        // In case there is no direct access to production timestamp service
+        // one can configure some alternative service by setting following parameter
+        // configuration.setTspSource("https://.../ts");
+
         // Open ASiC-S container with expired timestamp which service is withdrawn in TSL
         String filepath = "src/test/resources/files/live/asics/" + fileName + ".asics";
         Container container = ContainerOpener.open(filepath, configuration);
@@ -304,9 +308,8 @@ class AsicsTimestampTest {
         String timestampId = container.getTimestamps().get(0).getUniqueId();
 
         // Add timestamp
-        Exception exception = assertThrows(eu.europa.esig.dss.alert.exception.AlertException.class, () -> {
-            container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping());
-        });
+        Exception exception = assertThrows(eu.europa.esig.dss.alert.exception.AlertException.class,
+                () -> container.addTimestamp(TimestampBuilder.aTimestamp(container).invokeTimestamping()));
         assertTrue(exception.getMessage().contains("Broken timestamp(s) detected. [" + timestampId + ": Signature is not intact!]"));
     }
 
