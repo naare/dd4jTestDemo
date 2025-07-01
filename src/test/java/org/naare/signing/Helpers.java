@@ -27,7 +27,8 @@ public class Helpers {
     }
 
     public static PKCS11SignatureToken getDefaultPkcs11SignatureToken(String PinCode) {
-        return new PKCS11SignatureToken("C:/Program Files/IDEMIA/AWP/DLLs/OcsCryptoki.dll", PinCode.toCharArray(), 1);
+        return new PKCS11SignatureToken("C:/Program Files/OpenSC Project/OpenSC/pkcs11/opensc-pkcs11.dll", PinCode.toCharArray(), 1); //ID kaart
+//        return new PKCS11SignatureToken("C:\\Windows\\System32\\eTPKCS11.dll", PinCode.toCharArray(), 0); //SafeNet krüptopulk
     }
 
     public static PKCS12SignatureToken getDefaultPkcs12SignatureToken(String PinCode) {
