@@ -13,6 +13,7 @@ It contains following test classes:
 1. Java 8 or higher. 
 2. Tested DD4J version is in Maven repository.
 3. In POM file tested DD4J is assigned.
+4. OpenSC PKCS11 driver installed for testing with Estonian ID card (IDEMIA)
 
 ### Setting up
 1. DD4J version is in (local) Maven repository. To test unpublished version, there are two options:
