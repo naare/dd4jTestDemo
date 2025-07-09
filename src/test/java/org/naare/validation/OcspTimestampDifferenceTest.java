@@ -20,7 +20,7 @@ class OcspTimestampDifferenceTest {
             "LV_LT_sig_OCSP_22h_after_TS",
             "LV_LT_sig_OCSP_44h_after_TSP"})
     void foreignSignatureOcspAfterTsPass(String fileName) {
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
@@ -38,7 +38,7 @@ class OcspTimestampDifferenceTest {
     @Test
     void estonianSignatureOcsp24hAfterTsFail() {
         String expectedOcspError = "The difference between the OCSP response time and the signature timestamp is too large";
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
@@ -63,7 +63,7 @@ class OcspTimestampDifferenceTest {
         String expectedOcspError = "The time difference between the signature timestamp and the OCSP response exceeds "
                 + testConfiguration.getAllowedTimestampAndOCSPResponseDeltaInMinutes()
                 + " minutes, rendering the OCSP response not 'fresh'.";
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
@@ -86,7 +86,7 @@ class OcspTimestampDifferenceTest {
             "EE_LT_sig_OCSP_8m_after_TS"
     })
     void estonianSignatureOcspLessThen15mAfterTsPass(String fileName) {
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
@@ -103,7 +103,7 @@ class OcspTimestampDifferenceTest {
 
     @Test
     void estonianSignatureMissingOcspFail() {
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
@@ -127,7 +127,7 @@ class OcspTimestampDifferenceTest {
             "hellopades-lt-sha256-ocsp-28h"
     })
     void estonianPadesSignatureOcspAfterTsPass(String fileName) {
-        testConfiguration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).

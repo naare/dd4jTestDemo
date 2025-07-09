@@ -18,7 +18,7 @@ public class OcspSourceTest {
         configuration.setSigningOcspSourceFactory(() -> null);
         configuration.setExtendingOcspSourceFactory(() -> null);
         configuration.setOcspSource(null);
-        configuration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        configuration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(configuration).

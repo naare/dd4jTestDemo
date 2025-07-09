@@ -16,7 +16,7 @@ class SignatureTspSourceTest {
     @Test
     void sign_withBaltstampSignatureTspSource() {
         Configuration configuration = Configuration.of(Configuration.Mode.TEST);
-        configuration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        configuration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
         configuration.setTspSource("http://tsa.baltstamp.lt");
 
         // Create signed container

@@ -28,7 +28,7 @@ class TrustServiceLevelTest {
     void setup() {
         configuration = Configuration.of(Configuration.Mode.TEST);
         defaultTspSource = configuration.getTspSource();
-        configuration.setLotlLocation("http://repo.ria/tsl/trusted-test-mp.xml");
+        configuration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
     }
 
     @ParameterizedTest
