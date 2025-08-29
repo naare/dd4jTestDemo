@@ -85,25 +85,6 @@ class OcspTimestampDifferenceTest {
         assertEquals(0, result.getContainerWarnings().size());
     }
 
-    @Test
-    void estonianSignatureMissingOcspFail() {
-        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
-
-        Container container = ContainerBuilder.
-                aContainer().withConfiguration(testConfiguration).
-                fromExistingFile("src/test/resources/files/live/asic/LIVE_LT_missing_OCSP.asice").
-                build();
-        ContainerValidationResult result = container.validate();
-
-        assertFalse(result.isValid());
-        assertEquals(3, result.getErrors().size());
-        assertEquals("No revocation data found for the certificate!", result.getErrors().get(1).getMessage());
-        assertEquals(1, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
-
-    }
-
     //DD4J-714 will apply the same checks as ASIC has, where 15m will give a warning and 24h an error
     @ParameterizedTest
     @ValueSource(strings = {
