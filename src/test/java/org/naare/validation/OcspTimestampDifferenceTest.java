@@ -35,31 +35,15 @@ class OcspTimestampDifferenceTest {
         assertEquals(0, result.getContainerWarnings().size());
     }
 
-    @Test
-    void estonianSignatureOcsp24hAfterTsFail() {
-        String expectedOcspError = "The difference between the OCSP response time and the signature timestamp is too large";
-        testConfiguration.setLotlLocation("http://ib-repo-01.dev.riaint.ee/tsl/trusted-test-mp.xml");
-
-        Container container = ContainerBuilder.
-                aContainer().withConfiguration(testConfiguration).
-                fromExistingFile("src/test/resources/files/live/asic/EE_LT_sig_OCSP_25h_after_TS.asice").
-                build();
-        ContainerValidationResult result = container.validate();
-
-        assertFalse(result.isValid());
-        assertEquals(1, result.getErrors().size());
-        assertEquals(expectedOcspError, result.getErrors().get(0).getMessage());
-        assertEquals(1, result.getWarnings().size());
-        assertEquals(0, result.getContainerErrors().size());
-        assertEquals(0, result.getContainerWarnings().size());
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {
-            "EE_LT_sig_OCSP_15m6s_after_TS",
-            "EE_LT_sig_OCSP_37m_after_TS"
+            "asic/EE_LT_sig_OCSP_15m6s_after_TS.asice",
+            "asic/EE_LT_sig_OCSP_37m_after_TS.asice",
+            "asic/EE_LT_sig_OCSP_3months_after_TS.asice",
+            "bdoc/EE_LT_sig_OCSP_15m6s_after_TS.bdoc",
+            "bdoc/EE_LT_sig_OCSP_3months_after_TS.bdoc"
     })
-    void estonianSignatureOcspMoreThen15mAndLessThan24hAfterTsPassWithWarning(String fileName) {
+    void estonianSignatureOcspMoreThen15mAfterTsPassWithWarning(String fileName) {
         String expectedOcspError = "The time difference between the signature timestamp and the OCSP response exceeds "
                 + testConfiguration.getAllowedTimestampAndOCSPResponseDeltaInMinutes()
                 + " minutes, rendering the OCSP response not 'fresh'.";
@@ -67,7 +51,7 @@ class OcspTimestampDifferenceTest {
 
         Container container = ContainerBuilder.
                 aContainer().withConfiguration(testConfiguration).
-                fromExistingFile("src/test/resources/files/test/asic/" + fileName + ".asice").
+                fromExistingFile("src/test/resources/files/test/" + fileName).
                 build();
         ContainerValidationResult result = container.validate();
 
